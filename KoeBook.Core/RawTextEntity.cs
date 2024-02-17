@@ -1,9 +1,5 @@
-namespace KoeBook.Core;
+﻿namespace KoeBook.Core;
 internal class RawTextEntity
 {
-    public string RawText
-    {
-        get;
-        set;
-    }
+    public string RawText { get; set; }
 }

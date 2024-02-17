@@ -1,9 +1,5 @@
-namespace KoeBook.Common;
+﻿namespace KoeBook.Common;
 internal class ScriptTextEntity
 {
-    public required ScriptLine[] ScriptLines
-    {
-        get;
-        set;
-    }
+    public required ScriptLine[] ScriptLines { get; set; }
 }
