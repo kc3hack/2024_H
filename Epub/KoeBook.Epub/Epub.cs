@@ -1,4 +1,4 @@
-namespace Epub;
+namespace KoeBook.Epub;
 
 public class Epub
 {
