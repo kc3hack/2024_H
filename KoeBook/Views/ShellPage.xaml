@@ -11,18 +11,22 @@
     Loaded="OnLoaded">
 
     <TabView
-            Canvas.ZIndex="0"
-            SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}">
+            x:Name="MainTab"
+            IsAddTabButtonVisible="False">
         <TabView.TabItems>
-            <TabViewItem x:Uid="Shell_Main">
+            <TabViewItem x:Uid="Shell_Main" IsClosable="False">
                 <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="Page"/>
+                    <SymbolIconSource Symbol="Home"/>
                 </TabViewItem.IconSource>
-                <local:MainPage/>
+                <local:MainPage />
             </TabViewItem>
         </TabView.TabItems>
         <TabView.TabStripFooter>
-            <Button HorizontalAlignment="Right" Margin="0,0,140,0">
+            <Button
+                HorizontalAlignment="Right"
+                Margin="0,0,140,0"
+                Command="{x:Bind ViewModel.OpenSettingsTabCommand}"
+                CommandParameter="{x:Bind MainTab}">
                 <SymbolIcon Symbol="Setting" />
             </Button>
         </TabView.TabStripFooter>

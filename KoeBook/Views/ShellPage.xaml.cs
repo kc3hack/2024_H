@@ -24,7 +24,7 @@ public sealed partial class ShellPage : Page
         ViewModel = viewModel;
         InitializeComponent();
 
-        App.MainWindow.ExtendsContentIntoTitleBar = true;
+        //App.MainWindow.ExtendsContentIntoTitleBar = true;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
