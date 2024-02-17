@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "KoeBook (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "KoeBook (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
