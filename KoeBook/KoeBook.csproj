@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KoeBook.Core\KoeBook.Core.csproj" />
+    <ProjectReference Include="..\Epub\KoeBook.Epub\KoeBook.Epub.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
