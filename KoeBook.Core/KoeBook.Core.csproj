@@ -12,5 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Epub\KoeBook.Epub\KoeBook.Epub.csproj" />
   </ItemGroup>
 </Project>
