@@ -10,12 +10,12 @@ namespace KoeBook.Helpers;
 //
 // Usage in code:
 // NavigationHelper.SetNavigateTo(navigationViewItem, typeof(MainViewModel).FullName);
-public class NavigationHelper
+public class TabHelper
 {
-    public static string GetNavigateTo(NavigationViewItem item) => (string)item.GetValue(NavigateToProperty);
+    public static Guid GetNavigateTo(TabViewItem item) => (Guid)item.GetValue(NavigateToProperty);
 
-    public static void SetNavigateTo(NavigationViewItem item, string value) => item.SetValue(NavigateToProperty, value);
+    public static void SetNavigateTo(TabViewItem item, Guid value) => item.SetValue(NavigateToProperty, value);
 
     public static readonly DependencyProperty NavigateToProperty =
-        DependencyProperty.RegisterAttached("NavigateTo", typeof(string), typeof(NavigationHelper), new PropertyMetadata(null));
+        DependencyProperty.RegisterAttached("NavigateTo", typeof(Guid), typeof(TabHelper), new PropertyMetadata(default(Guid)));
 }

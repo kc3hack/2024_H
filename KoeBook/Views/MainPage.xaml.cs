@@ -6,10 +6,9 @@ namespace KoeBook.Views;
 
 public sealed partial class MainPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
+    public static readonly Guid Id = Guid.NewGuid();
+
+    public MainViewModel ViewModel { get; }
 
     public MainPage()
     {

@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea" Padding="10">
+    <Grid x:Name="ContentArea">
         <Grid>
             <TextBlock Text="aaaaaaaa"/>
         </Grid>

@@ -10,25 +10,40 @@
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     Loaded="OnLoaded">
 
-    <TabView
-            x:Name="MainTab"
+    <Grid>
+        <TabView
+            Canvas.ZIndex="0"
+            x:Name="MainTabView"
             IsAddTabButtonVisible="False">
-        <TabView.TabItems>
-            <TabViewItem x:Uid="Shell_Main" IsClosable="False">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="Home"/>
-                </TabViewItem.IconSource>
-                <local:MainPage />
-            </TabViewItem>
-        </TabView.TabItems>
-        <TabView.TabStripFooter>
-            <Button
-                HorizontalAlignment="Right"
-                Margin="0,0,140,0"
-                Command="{x:Bind ViewModel.OpenSettingsTabCommand}"
-                CommandParameter="{x:Bind MainTab}">
-                <SymbolIcon Symbol="Setting" />
-            </Button>
-        </TabView.TabStripFooter>
-    </TabView>
+            <TabView.TabItems>
+                <TabViewItem
+                    IsClosable="False"
+                    Header="ホーム"
+                    helpers:TabHelper.NavigateTo="{Binding ElementName=MainPage, Path=Id, Mode=OneTime}">
+                    <TabViewItem.IconSource>
+                        <SymbolIconSource Symbol="Home"/>
+                    </TabViewItem.IconSource>
+                    <local:MainPage x:Name="MainPage" Margin="20,10,20,0"/>
+                </TabViewItem>
+            </TabView.TabItems>
+            <TabView.TabStripHeader>
+                <Button
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="4,0,0,0"
+                    Command="{x:Bind ViewModel.OpenSettingsTabCommand}"
+                    CommandParameter="{x:Bind MainTabView}">
+                    <SymbolIcon Symbol="Setting" />
+                </Button>
+            </TabView.TabStripHeader>
+            <TabView.TabStripFooter>
+                <Grid
+                    x:Name="AppTitleBar"
+                    MaxHeight="{Binding ElementName=MainTabView, Path=ActualHeight}" 
+                    Canvas.ZIndex="1"
+                    IsHitTestVisible="True">
+                </Grid>
+            </TabView.TabStripFooter>
+        </TabView>
+    </Grid>
 </Page>
