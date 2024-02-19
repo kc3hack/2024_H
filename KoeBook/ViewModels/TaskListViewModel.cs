@@ -21,9 +21,9 @@ public sealed partial class TaskListViewModel : ObservableObject
         GenerationTasks.CollectionChanged += TaskCollectionChanged;
     }
 
-    private void TaskCollectionChanged(object? sender,  NotifyCollectionChangedEventArgs e)
+    private void TaskCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if(e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
+        if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
         {
             OnPropertyChanged(nameof(ListVisibility));
             OnPropertyChanged(nameof(InfoVisibility));

@@ -115,7 +115,7 @@
 
                                             <ProgressBar
                                                 Value="{x:Bind Progress, Mode=OneWay}"
-                                                Maximum="{x:Bind Progress, Mode=OneWay}" />
+                                                Maximum="{x:Bind MaximumProgress, Mode=OneWay}" />
                                             <TextBlock
                                                 Grid.Column="1"
                                                 VerticalAlignment="Center"
