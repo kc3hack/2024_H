@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - uses: microsoft/setup-msbuild@v1.0.2
+
+      - run: dotnet restore
+      - run: dotnet format whitespace --verify-no-changes
+      - run: dotnet build -c Release
+
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - uses: microsoft/setup-msbuild@v1.0.2
+
+      - run: dotnet restore
+      - run: dotnet test
