@@ -16,7 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\Dialog\DialogContentControl.xaml" />
-    <None Remove="Styles\Card.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,9 +44,6 @@
     <Page Update="Components\Dialog\DialogContentControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Styles\Card.xaml">
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
 

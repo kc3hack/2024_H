@@ -13,17 +13,8 @@ public sealed partial class MainPage : Page
 
     public MainPage()
     {
-        try
-        {
-
         ViewModel = App.GetService<MainViewModel>();
         TaskListViewModel = App.GetService<TaskListViewModel>();
         InitializeComponent();
-        }
-        catch (Exception e)
-        {
-
-            throw;
-        }
     }
 }

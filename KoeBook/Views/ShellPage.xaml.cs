@@ -16,9 +16,6 @@ public sealed partial class ShellPage : Page
 
     public ShellPage(ShellViewModel viewModel)
     {
-        try
-        {
-
         ViewModel = viewModel;
         InitializeComponent();
 
@@ -27,12 +24,6 @@ public sealed partial class ShellPage : Page
         ViewModel.TabViewService.Initialize(MainTabView);
         App.MainWindow.ExtendsContentIntoTitleBar = true;
         App.MainWindow.SetTitleBar(AppTitleBar);
-        }
-        catch (Exception e)
-        {
-
-            throw;
-        }
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
