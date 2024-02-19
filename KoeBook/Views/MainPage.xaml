@@ -4,69 +4,110 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:KoeBook.Models"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+    <ScrollView
+        x:Name="ContentArea"
+        ZoomMode="Disabled"
+        HorizontalScrollMode="Disabled">
+        <StackPanel>
 
-        <StackPanel
-            Background="{ThemeResource CardBackgroundFillColorDefault}"
-            BorderBrush="{ThemeResource CardStrokeColorDefault}"
-            BorderThickness="1"
-            Padding="24,16,24,16"
-            CornerRadius="12"
-            HorizontalAlignment="Stretch">
-            
             <TextBlock
-                Style="{StaticResource SubtitleTextBlockStyle}"
+                Style="{StaticResource TitleTextBlockStyle}"
                 Text="書籍選択"/>
 
             <StackPanel
-                    Margin="{StaticResource SmallTopBottomMargin}">
-                <TextBlock Text="EPubファイルを読み上げる"/>
-                <StackPanel Orientation="Horizontal" Margin="{StaticResource XSmallTopMargin}">
-                    <Button
-                        Command="{x:Bind ViewModel.OpenEBookFileCommand}"
-                        Content="ファイルを選択する"/>
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Padding="30,0,0,0"
-                        TextWrapping="Wrap"
-                        Style="{StaticResource BodyTextStyle}"
-                        Text="{x:Bind ViewModel.EbookFileName, Mode=OneWay}"/>
+                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                BorderThickness="1"
+                Padding="24,16,24,16"
+                CornerRadius="12"
+                Margin="{StaticResource SmallTopMargin}"
+                HorizontalAlignment="Stretch">
+
+                <StackPanel>
+                    <TextBlock Text="EPubファイルを読み上げる"/>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource XSmallTopMargin}">
+                        <Button
+                            Command="{x:Bind ViewModel.OpenEBookFileCommand}"
+                            Content="ファイルを選択する"/>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Padding="30,0,0,0"
+                            TextWrapping="Wrap"
+                            Style="{StaticResource BodyTextStyle}"
+                            Text="{x:Bind ViewModel.EbookFileName, Mode=OneWay}"/>
+                    </StackPanel>
                 </StackPanel>
+
+                <StackPanel
+                        Margin="{StaticResource SmallTopBottomMargin}">
+                    <TextBlock Text="外部サイトを読み上げる (未対応)"/>
+                    <TextBox
+                        Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay}"
+                        BeforeTextChanging="{x:Bind ViewModel.BeforeTextChanging}"
+                        Margin="{StaticResource XSmallTopMargin}" />
+                </StackPanel>
+
+                <Button
+                    Margin="{StaticResource SmallTopMargin}"
+                    Command="{x:Bind ViewModel.StartProcessCommand}"
+                    Content="読み上げを作成" />
             </StackPanel>
 
             <StackPanel
-                    Margin="{StaticResource SmallTopBottomMargin}">
-                <TextBlock Text="外部サイトを読み上げる (未対応)"/>
-                <TextBox Margin="{StaticResource XSmallTopMargin}" />
+                Margin="{StaticResource MediumTopMargin}">
+                <TextBlock
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="実行中タスク"/>
+
+                <ListView
+                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                    BorderThickness="1"
+                    Padding="2,3,2,3"
+                    CornerRadius="6"
+                    ItemsSource="{x:Bind TaskListViewModel.ProcessingTasks, Mode=OneWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ProcessingTask">
+                            <ListViewItem
+                                Padding="10">
+                                <Grid RowSpacing="2" ColumnSpacing="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid
+                                        BorderBrush="{ThemeResource ControlAAStrokeColorDefault}"
+                                        BorderThickness="1"
+                                        Padding="2,1,2,1"
+                                        CornerRadius="10"
+                                        Width="100">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            Text="{x:Bind StateText}" />
+                                    </Grid>
+
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{x:Bind Title, Mode=OneWay}"/>
+                                    <ProgressBar
+                                        Grid.ColumnSpan="2"
+                                        Grid.Row="1"
+                                        Padding="2,3,2,3"
+                                        Value="{x:Bind Progress, Mode=OneWay}"/>
+                                </Grid>
+                            </ListViewItem>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
-
-            <Button
-                Margin="{StaticResource SmallTopMargin  }"
-                Content="読み上げを作成" />
         </StackPanel>
-
-        <StackPanel
-            Grid.Row="1">
-            <ListView>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <TextBlock
-                                Text="jli" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackPanel>
-    </Grid>
+    </ScrollView>
 </Page>

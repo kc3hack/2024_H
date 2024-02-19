@@ -1,22 +1,24 @@
-﻿using KoeBook.Contracts.Services;
+﻿using System.Collections.ObjectModel;
+using KoeBook.Contracts.Services;
 using KoeBook.Models;
 
 namespace KoeBook.Services;
 
 public class ProcessingTaskService : IProcessingTaskService
 {
-    private readonly Dictionary<Guid, ProcessingTask> _tasks = [];
+    private readonly ObservableCollection<ProcessingTask> _tasks = [];
 
-    public event Action<ProcessingTask>? OnRegistered;
+    public ObservableCollection<ProcessingTask> Tasks => _tasks;
 
-    public event Action<ProcessingTask>? OnUnregistered;
+    public event Action<ProcessingTask, ChangedEvents>? OnTasksChanged;
 
     public ProcessingTask GetProcessingTask(Guid processId)
     {
         ProcessingTask? task;
         lock (_tasks)
         {
-            if (!_tasks.TryGetValue(processId, out task))
+            task = _tasks.FirstOrDefault(t => t.Id == processId);
+            if (task is null)
                 throw new ArgumentException($"Task not found: {processId}.");
         }
         return task;
@@ -26,27 +28,28 @@ public class ProcessingTaskService : IProcessingTaskService
     {
         lock (_tasks)
         {
-            if (_tasks.ContainsKey(task.Id))
+            var processId = task.Id;
+            if (_tasks.Any(t => t.Id == processId))
                 throw new ArgumentException($"The key {task.Id} is already registered in {nameof(ProcessingTaskService)}");
 
-            _tasks.Add(task.Id, task);
+            _tasks.Insert(0, task);
         }
 
-        OnRegistered?.Invoke(task);
+        OnTasksChanged?.Invoke(task, ChangedEvents.Registered);
     }
 
     public void Unregister(Guid processId)
     {
-        ProcessingTask processingTask;
+        ProcessingTask? task;
         lock (_tasks)
         {
-            if (!_tasks.ContainsKey(processId))
+            task = _tasks.FirstOrDefault(t => t.Id == processId);
+            if (task is null)
                 throw new ArgumentException($"The key {processId} is already unregistered in {nameof(ProcessingTaskService)}");
 
-            processingTask = _tasks[processId];
-            _tasks.Remove(processId);
+            _tasks.Remove(task);
         }
 
-        OnUnregistered?.Invoke(processingTask);
+        OnTasksChanged?.Invoke(task, ChangedEvents.Unregistered);
     }
 }

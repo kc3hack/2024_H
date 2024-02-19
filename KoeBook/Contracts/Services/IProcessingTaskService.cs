@@ -1,16 +1,23 @@
-﻿using KoeBook.Models;
+﻿using System.Collections.ObjectModel;
+using KoeBook.Models;
 
 namespace KoeBook.Contracts.Services;
 
 public interface IProcessingTaskService
 {
-    event Action<ProcessingTask>? OnRegistered;
+    ObservableCollection<ProcessingTask> Tasks { get; }
 
-    event Action<ProcessingTask>? OnUnregistered;
+    event Action<ProcessingTask, ChangedEvents>? OnTasksChanged;
 
     ProcessingTask GetProcessingTask(Guid processId);
 
     void Register(ProcessingTask task);
 
     void Unregister(Guid processId);
+}
+
+public enum ChangedEvents
+{
+    Registered,
+    Unregistered,
 }

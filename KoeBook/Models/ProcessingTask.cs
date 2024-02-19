@@ -1,22 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FastEnumUtility;
 
 namespace KoeBook.Models;
 
-public class ProcessingTask
+public partial class ProcessingTask(Guid id, string source, SourceType sourceType) : ObservableObject
 {
-    public ProcessingTask()
-    {
-        Id = Guid.NewGuid();
-    }
+    public Guid Id { get; } = id;
 
-    public ProcessingTask(Guid id)
-    {
-        Id = id;
-    }
+    public string Source { get; } = source;
 
-    public Guid Id { get; }
+    public SourceType SourceType { get; } = sourceType;
+
+    [ObservableProperty]
+    private string _title = sourceType == SourceType.FilePath ? Path.GetFileName(source) : source;
+
+    /// <summary>
+    /// 進捗 (0~255)
+    /// </summary>
+    [ObservableProperty]
+    private byte _progress;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StateText))]
+    private ProcessingState _state;
+
+    public string StateText => State.GetEnumMemberValue()!;
 }
