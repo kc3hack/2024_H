@@ -45,7 +45,7 @@
                         Margin="{StaticResource SmallTopBottomMargin}">
                     <TextBlock Text="外部サイトを読み上げる (未対応)"/>
                     <TextBox
-                        Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay}"
+                        Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         BeforeTextChanging="{x:Bind ViewModel.BeforeTextChanging}"
                         Margin="{StaticResource XSmallTopMargin}" />
                 </StackPanel>
