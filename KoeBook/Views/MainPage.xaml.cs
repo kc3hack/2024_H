@@ -1,5 +1,4 @@
 ﻿using KoeBook.ViewModels;
-
 using Microsoft.UI.Xaml.Controls;
 
 namespace KoeBook.Views;
@@ -14,5 +13,5 @@ public sealed partial class MainPage : Page
     {
         ViewModel = App.GetService<MainViewModel>();
         InitializeComponent();
-    }
+    } 
 }

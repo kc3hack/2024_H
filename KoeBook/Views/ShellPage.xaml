@@ -9,21 +9,21 @@
     xmlns:behaviors="using:KoeBook.Behaviors"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     Loaded="OnLoaded">
-
+    
     <Grid>
         <TabView
-            Canvas.ZIndex="0"
             x:Name="MainTabView"
+            Canvas.ZIndex="0"
             IsAddTabButtonVisible="False">
             <TabView.TabItems>
                 <TabViewItem
+                    x:Name="MainPageTab"
                     IsClosable="False"
-                    Header="ホーム"
-                    helpers:TabHelper.NavigateTo="{Binding ElementName=MainPage, Path=Id, Mode=OneTime}">
+                    Header="ホーム">
                     <TabViewItem.IconSource>
                         <SymbolIconSource Symbol="Home"/>
                     </TabViewItem.IconSource>
-                    <local:MainPage x:Name="MainPage" Margin="20,10,20,0"/>
+                    <local:MainPage x:Name="MainPage" Margin="20,20,20,0"/>
                 </TabViewItem>
             </TabView.TabItems>
             <TabView.TabStripHeader>
@@ -40,7 +40,6 @@
                 <Grid
                     x:Name="AppTitleBar"
                     MaxHeight="{Binding ElementName=MainTabView, Path=ActualHeight}" 
-                    Canvas.ZIndex="1"
                     IsHitTestVisible="True">
                 </Grid>
             </TabView.TabStripFooter>

@@ -7,8 +7,66 @@
     mc:Ignorable="d">
 
     <Grid x:Name="ContentArea">
-        <Grid>
-            <TextBlock Text="aaaaaaaa"/>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Background="{ThemeResource CardBackgroundFillColorDefault}"
+            BorderBrush="{ThemeResource CardStrokeColorDefault}"
+            BorderThickness="1"
+            Padding="24,16,24,16"
+            CornerRadius="12"
+            HorizontalAlignment="Stretch">
+            
+            <TextBlock
+                Style="{StaticResource SubtitleTextBlockStyle}"
+                Text="書籍選択"/>
+
+            <StackPanel
+                    Margin="{StaticResource SmallTopBottomMargin}">
+                <TextBlock Text="EPubファイルを読み上げる"/>
+                <StackPanel Orientation="Horizontal" Margin="{StaticResource XSmallTopMargin}">
+                    <Button
+                        Command="{x:Bind ViewModel.OpenEBookFileCommand}"
+                        Content="ファイルを選択する"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Padding="30,0,0,0"
+                        TextWrapping="Wrap"
+                        Style="{StaticResource BodyTextStyle}"
+                        Text="{x:Bind ViewModel.EbookFileName, Mode=OneWay}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel
+                    Margin="{StaticResource SmallTopBottomMargin}">
+                <TextBlock Text="外部サイトを読み上げる (未対応)"/>
+                <TextBox Margin="{StaticResource XSmallTopMargin}" />
+            </StackPanel>
+
+            <Button
+                Margin="{StaticResource SmallTopMargin  }"
+                Content="読み上げを作成" />
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1">
+            <ListView>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Text="jli" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
     </Grid>
 </Page>

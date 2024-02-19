@@ -10,7 +10,6 @@ using Windows.System;
 
 namespace KoeBook.Views;
 
-// TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
@@ -19,6 +18,8 @@ public sealed partial class ShellPage : Page
     {
         ViewModel = viewModel;
         InitializeComponent();
+
+        TabHelper.SetNavigateTo(MainPageTab, MainPage.Id);
 
         ViewModel.TabViewService.Initialize(MainTabView);
         App.MainWindow.ExtendsContentIntoTitleBar = true;
