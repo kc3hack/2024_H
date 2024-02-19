@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="FastEnum" Version="1.8.0" />
     <PackageReference Include="ReactiveProperty" Version="9.4.1" />
   </ItemGroup>
 
