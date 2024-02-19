@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
 namespace KoeBook.Models;
 
-public enum ProcessingState
+public enum GenerationState
 {
     [EnumMember(Value = "待機中")]
     Waiting,
@@ -20,6 +15,9 @@ public enum ProcessingState
 
     [EnumMember(Value = "音声生成中")]
     SoundProducing,
+
+    [EnumMember(Value = "出力中")]
+    Publishing,
 
     [EnumMember(Value = "生成完了")]
     Completed,

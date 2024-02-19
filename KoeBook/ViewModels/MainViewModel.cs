@@ -10,7 +10,7 @@ namespace KoeBook.ViewModels;
 
 public sealed partial class MainViewModel : ObservableRecipient
 {
-    private readonly IProcessingTaskService _taskService;
+    private readonly IGenerationTaskService _taskService;
 
     private readonly IDialogService _dialogService;
 
@@ -27,7 +27,7 @@ public sealed partial class MainViewModel : ObservableRecipient
 
     private bool CanExecuteStartProcess => EbookFilePath is not null || !string.IsNullOrEmpty(EbookUrl);
 
-    public MainViewModel(IProcessingTaskService taskService, IDialogService dialogService)
+    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService)
     {
         _taskService = taskService;
         _dialogService = dialogService;

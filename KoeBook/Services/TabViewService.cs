@@ -10,13 +10,13 @@ namespace KoeBook.Services;
 
 public class TabViewService : ITabViewService
 {
-    private readonly IProcessingTaskService _taskService;
+    private readonly IGenerationTaskService _taskService;
 
     private TabView? _tabView;
 
     private Thickness TabContentThickness => new(20, 10, 20, 0);
 
-    public TabViewService(IProcessingTaskService processingTaskService)
+    public TabViewService(IGenerationTaskService processingTaskService)
     {
         _taskService = processingTaskService;
     }
@@ -58,7 +58,7 @@ public class TabViewService : ITabViewService
         return null;
     }
 
-    public TabViewItem? GetOrCreateTab(ProcessingTask processingTask)
+    public TabViewItem? GetOrCreateTab(GenerationTask processingTask)
     {
         if (_tabView is null)
             return null;

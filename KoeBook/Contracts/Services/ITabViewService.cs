@@ -13,7 +13,7 @@ public interface ITabViewService
 
     TabViewItem? GetExistingTab(Guid id);
 
-    TabViewItem? GetOrCreateTab(ProcessingTask processingTask);
+    TabViewItem? GetOrCreateTab(GenerationTask processingTask);
 
     TabViewItem? GetOrCreateSettings();
 }

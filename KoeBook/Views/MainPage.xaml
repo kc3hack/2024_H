@@ -51,6 +51,7 @@
                 </StackPanel>
 
                 <Button
+                    Style="{StaticResource AccentButtonStyle}"
                     Margin="{StaticResource SmallTopMargin}"
                     Command="{x:Bind ViewModel.StartProcessCommand}"
                     Content="読み上げを作成" />
@@ -62,51 +63,71 @@
                     Style="{StaticResource TitleTextBlockStyle}"
                     Text="実行中タスク"/>
 
-                <ListView
-                    Background="{ThemeResource CardBackgroundFillColorDefault}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                    BorderThickness="1"
-                    Padding="2,3,2,3"
-                    CornerRadius="6"
-                    ItemsSource="{x:Bind TaskListViewModel.ProcessingTasks, Mode=OneWay}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:ProcessingTask">
-                            <ListViewItem
-                                Padding="10">
-                                <Grid RowSpacing="2" ColumnSpacing="10">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                <Grid>
+                    <TextBlock
+                        FontSize="24"
+                        Padding="{StaticResource LargeTopMargin}"
+                        HorizontalAlignment="Center"
+                        Visibility="{x:Bind TaskListViewModel.InfoVisibility, Mode=OneWay}"
+                        Text="実行中のタスクはありません"/>
 
-                                    <Grid
-                                        BorderBrush="{ThemeResource ControlAAStrokeColorDefault}"
-                                        BorderThickness="1"
-                                        Padding="2,1,2,1"
-                                        CornerRadius="10"
-                                        Width="100">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            Text="{x:Bind StateText}" />
-                                    </Grid>
+                    <ListView
+                        SelectionMode="None"
+                        IsItemClickEnabled="True"
+                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        Padding="2,3,2,3"
+                        CornerRadius="6"
+                        Visibility="{x:Bind TaskListViewModel.ListVisibility, Mode=OneWay}"
+                        Margin="{StaticResource SmallTopMargin}"
+                        ItemsSource="{x:Bind TaskListViewModel.GenerationTasks, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:GenerationTask">
+                                <ListViewItem
+                                    Padding="18,12,18,12">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Grid
+                                                BorderBrush="{ThemeResource ControlAAStrokeColorDefault}"
+                                                BorderThickness="1"
+                                                Padding="3,2,3,2"
+                                                CornerRadius="12"
+                                                Width="100">
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Text="{x:Bind StateText}" />
+                                            </Grid>
 
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Text="{x:Bind Title, Mode=OneWay}"/>
-                                    <ProgressBar
-                                        Grid.ColumnSpan="2"
-                                        Grid.Row="1"
-                                        Padding="2,3,2,3"
-                                        Value="{x:Bind Progress, Mode=OneWay}"/>
-                                </Grid>
-                            </ListViewItem>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                                            <TextBlock 
+                                                VerticalAlignment="Center"
+                                                Margin="{StaticResource SmallLeftMargin}"
+                                                Text="{x:Bind Title, Mode=OneWay}"/>
+                                        </StackPanel>
+
+                                        <Grid
+                                            Margin="{StaticResource SmallTopMargin}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="160" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ProgressBar
+                                                Value="{x:Bind Progress, Mode=OneWay}"
+                                                Maximum="{x:Bind Progress, Mode=OneWay}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right"
+                                                Text="{x:Bind ProgressText, Mode=OneWay}" />
+                                        </Grid> 
+                                    </StackPanel>
+                                </ListViewItem>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
             </StackPanel>
         </StackPanel>
     </ScrollView>
