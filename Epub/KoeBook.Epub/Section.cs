@@ -63,7 +63,7 @@ public sealed class Section
 
         for (int i = 0; i < section.Elements.Count; i++)
         {
-            if (section.Elements[i] is Paragraph para)
+            if (section.Elements[i] is Paragraph para && para.Audio != null)
             {
                 builder.AppendLine($"""
                     <par id="{Id}_p{i}_audio" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
@@ -79,5 +79,17 @@ public sealed class Section
             </smil>
             """);
         return builder.ToString();
+    }
+
+    public TimeSpan GetTotalTime()
+    {
+        var time = TimeSpan.Zero;
+        foreach (var element in Elements)
+        {
+            if(element is Paragraph para && para.Audio != null) {
+                time += para.Audio.TotalTime;
+            }
+        }
+        return time;
     }
 }
