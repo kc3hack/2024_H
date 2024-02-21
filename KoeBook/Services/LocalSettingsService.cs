@@ -5,8 +5,6 @@ using KoeBook.Helpers;
 using KoeBook.Models;
 
 using Microsoft.Extensions.Options;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace KoeBook.Services;
@@ -18,6 +16,7 @@ public class LocalSettingsService : ILocalSettingsService
 
     private readonly IFileService _fileService;
     private readonly LocalSettingsOptions _options;
+    private readonly ISecretSettingsService _secretSettingsService;
 
     private readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     private readonly string _applicationDataFolder;
@@ -27,10 +26,11 @@ public class LocalSettingsService : ILocalSettingsService
 
     private bool _isInitialized;
 
-    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
+    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options, ISecretSettingsService secretSettingsService)
     {
         _fileService = fileService;
         _options = options.Value;
+        _secretSettingsService = secretSettingsService;
 
         _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
         _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
@@ -84,5 +84,15 @@ public class LocalSettingsService : ILocalSettingsService
 
             await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
         }
+    }
+
+    public async ValueTask<string?> GetApiKeyAsync(CancellationToken cancellationToken)
+    {
+        return await _secretSettingsService.GetApiKeyAsync(_applicationDataFolder, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async ValueTask SaveApiKeyAsync(string apiKey, CancellationToken cancellationToken)
+    {
+        await _secretSettingsService.SaveApiKeyAsync(_applicationDataFolder, apiKey, cancellationToken).ConfigureAwait(false);
     }
 }

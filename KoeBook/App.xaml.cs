@@ -72,6 +72,7 @@ public partial class App : Application
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
+                services.AddSingleton<ISecretSettingsService, SecretSettingsService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();
