@@ -1,4 +1,5 @@
 ﻿using KoeBook.Contracts.Services;
+using KoeBook.Core.Models;
 using KoeBook.Models;
 
 namespace KoeBook.Services;

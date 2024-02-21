@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using FastEnumUtility;
+using KoeBook.Core.Models;
 
 namespace KoeBook.Models;
 
