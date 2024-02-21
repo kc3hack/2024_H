@@ -3,7 +3,7 @@
 public sealed class Section
 {
     public string Id { get; }
-    public string Title { get; set; } = "";
+    public string Title { get; set; }
     public List<Element> Elements { get; set; } = [];
 
     internal Section(string title)
