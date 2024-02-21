@@ -2,5 +2,5 @@
 
 public abstract class Element
 {
-    public string? StyleName { get; set; }
+    public string? ClassName { get; set; }
 }
