@@ -1,7 +1,7 @@
 ﻿namespace KoeBook.Epub;
 
-public class Paragraph : Element
+public sealed class Paragraph : Element
 {
-    internal Stream? Audio;
+    public Audio? Audio {  get; set; }
     public string? Text { get ; set ; }
 }

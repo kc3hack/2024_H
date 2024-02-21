@@ -2,7 +2,7 @@
 
 namespace KoeBook.Epub;
 
-internal class SectionService
+internal sealed class SectionService
 {
     private readonly List<Section> _sections = [];
     private SectionService() { }
