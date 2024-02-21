@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using KoeBook.Contracts.Services;
+using KoeBook.Core.Models;
 using KoeBook.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.UI.ViewManagement;
 
 namespace KoeBook.Components;
 

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace KoeBook.Models;
+namespace KoeBook.Core.Models;
 
 public enum GenerationState
 {

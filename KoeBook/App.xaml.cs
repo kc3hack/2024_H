@@ -24,15 +24,12 @@ public partial class App : Application
     // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
     // https://docs.microsoft.com/dotnet/core/extensions/configuration
     // https://docs.microsoft.com/dotnet/core/extensions/logging
-    public IHost Host
-    {
-        get;
-    }
+    public IHost Host { get; }
 
     public static T GetService<T>()
         where T : class
     {
-        if ((App.Current as App)!.Host.Services.GetService(typeof(T)) is not T service)
+        if ((Current as App)!.Host.Services.GetService(typeof(T)) is not T service)
         {
             throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
         }
@@ -48,47 +45,48 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        Host = Microsoft.Extensions.Hosting.Host.
-        CreateDefaultBuilder().
-        UseContentRoot(AppContext.BaseDirectory).
-        ConfigureServices((context, services) =>
-        {
-            // Default Activation Handler
-            services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+        Host = Microsoft.Extensions.Hosting.Host
+            .CreateDefaultBuilder()
+            .UseContentRoot(AppContext.BaseDirectory)
+            .ConfigureServices((context, services) =>
+            {
+                // Default Activation Handler
+                services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
-            // Other Activation Handlers
-            services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
+                // Other Activation Handlers
+                services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
 
-            // Services
-            services.AddSingleton<IAppNotificationService, AppNotificationService>();
-            services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-            services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-            services.AddTransient<INavigationViewService, NavigationViewService>();
-            services.AddSingleton<ITabViewService, TabViewService>();
+                // Services
+                services.AddSingleton<IAppNotificationService, AppNotificationService>();
+                services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+                services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+                services.AddTransient<INavigationViewService, NavigationViewService>();
+                services.AddSingleton<ITabViewService, TabViewService>();
 
-            services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
-            services.AddSingleton<IActivationService, ActivationService>();
-            services.AddSingleton<IPageService, PageService>();
-            services.AddSingleton<INavigationService, NavigationService>();
-            services.AddSingleton<IDialogService, DialogService>();
+                services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
+                services.AddSingleton<IActivationService, ActivationService>();
+                services.AddSingleton<IPageService, PageService>();
+                services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<IDialogService, DialogService>();
+                services.AddSingleton<INotifyStateChangedService, NotifyStateChangedService>();
 
-            // Core Services
-            services.AddSingleton<IFileService, FileService>();
+                // Core Services
+                services.AddSingleton<IFileService, FileService>();
 
-            // Views and ViewModels
-            services.AddTransient<SettingsViewModel>();
-            services.AddTransient<SettingsPage>();
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<TaskListViewModel>();
-            services.AddTransient<MainPage>();
-            services.AddTransient<ShellPage>();
-            services.AddTransient<ShellViewModel>();
-            services.AddTransient<EditDetailsViewModel>();
+                // Views and ViewModels
+                services.AddTransient<SettingsViewModel>();
+                services.AddTransient<SettingsPage>();
+                services.AddTransient<MainViewModel>();
+                services.AddTransient<TaskListViewModel>();
+                services.AddTransient<MainPage>();
+                services.AddTransient<ShellPage>();
+                services.AddTransient<ShellViewModel>();
+                services.AddTransient<EditDetailsViewModel>();
 
-            // Configuration
-            services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
-        }).
-        Build();
+                // Configuration
+                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+            })
+            .Build();
 
         App.GetService<IAppNotificationService>().Initialize();
 
@@ -105,8 +103,8 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
-        await App.GetService<IActivationService>().ActivateAsync(args);
+        await GetService<IActivationService>().ActivateAsync(args);
     }
 }
