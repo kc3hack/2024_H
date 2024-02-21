@@ -16,6 +16,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\Dialog\DialogContentControl.xaml" />
+    <None Remove="Components\StateProgressBar.xaml" />
+    <None Remove="Views\EditDetailsTab.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +43,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Components\StateProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\EditDetailsTab.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Components\Dialog\DialogContentControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

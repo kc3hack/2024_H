@@ -86,9 +86,9 @@ public sealed partial class MainViewModel : ObservableRecipient
         }
 
         var source = EbookFilePath ?? EbookUrl!;
+        _taskService.Register(new(Guid.NewGuid(), source, EbookFilePath is null ? SourceType.Url : SourceType.FilePath));
         EbookFilePath = null;
         EbookUrl = null;
-        _taskService.Register(new(Guid.NewGuid(), source, SourceType.FilePath));
     }
 
     public async void BeforeTextChanging(TextBox _, TextBoxBeforeTextChangingEventArgs args)

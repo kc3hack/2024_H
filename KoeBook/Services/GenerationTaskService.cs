@@ -1,14 +1,18 @@
-﻿using System.Collections.ObjectModel;
-using KoeBook.Contracts.Services;
+﻿using KoeBook.Contracts.Services;
 using KoeBook.Models;
 
 namespace KoeBook.Services;
 
 public class GenerationTaskService : IGenerationTaskService
 {
-    private readonly ObservableCollection<GenerationTask> _tasks = [];
+    private readonly List<GenerationTask> _tasks = [
+        new(Guid.NewGuid(), "book.epub", SourceType.FilePath){
+         Progress = 30,
+         MaximumProgress = 100,
+          State = GenerationState.Analyzing,
+        }];
 
-    public ObservableCollection<GenerationTask> Tasks => _tasks;
+    public IReadOnlyList<GenerationTask> Tasks => _tasks;
 
     public event Action<GenerationTask, ChangedEvents>? OnTasksChanged;
 
@@ -32,7 +36,7 @@ public class GenerationTaskService : IGenerationTaskService
             if (_tasks.Any(t => t.Id == id))
                 throw new ArgumentException($"The key {task.Id} is already registered in {nameof(GenerationTaskService)}");
 
-            _tasks.Insert(0, task);
+            _tasks.Add(task);
         }
 
         OnTasksChanged?.Invoke(task, ChangedEvents.Registered);

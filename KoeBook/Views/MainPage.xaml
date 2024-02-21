@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:KoeBook.Models"
+    xmlns:viewmodels="using:KoeBook.ViewModels"
     mc:Ignorable="d">
 
     <ScrollView
@@ -77,34 +77,48 @@
                         Background="{ThemeResource CardBackgroundFillColorDefault}"
                         BorderBrush="{ThemeResource CardStrokeColorDefault}"
                         BorderThickness="1"
-                        Padding="2,3,2,3"
+                        Padding="2,1,2,3"
                         CornerRadius="6"
                         Visibility="{x:Bind TaskListViewModel.ListVisibility, Mode=OneWay}"
                         Margin="{StaticResource SmallTopMargin}"
                         ItemsSource="{x:Bind TaskListViewModel.GenerationTasks, Mode=OneWay}">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:GenerationTask">
+                            <DataTemplate x:DataType="viewmodels:GenerationTaskViewModel">
                                 <ListViewItem
+                                    Margin="0,2,0,0"
                                     Padding="18,12,18,12">
                                     <StackPanel>
-                                        <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
                                             <Grid
                                                 BorderBrush="{ThemeResource ControlAAStrokeColorDefault}"
                                                 BorderThickness="1"
                                                 Padding="3,2,3,2"
-                                                CornerRadius="12"
+                                                Margin="1"
+                                                CornerRadius="15"
                                                 Width="100">
                                                 <TextBlock
                                                     VerticalAlignment="Center"
                                                     HorizontalAlignment="Center"
-                                                    Text="{x:Bind StateText}" />
+                                                    Text="{x:Bind Task.StateText, Mode=OneWay}" />
                                             </Grid>
 
-                                            <TextBlock 
+                                            <TextBlock
+                                                Grid.Column="1"
                                                 VerticalAlignment="Center"
                                                 Margin="{StaticResource SmallLeftMargin}"
-                                                Text="{x:Bind Title, Mode=OneWay}"/>
-                                        </StackPanel>
+                                                Text="{x:Bind Task.Title, Mode=OneWay}"/>
+                                            <Button
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                Content="詳細"
+                                                Command="{x:Bind OpenEditTabCommand}"/>
+                                        </Grid>
 
                                         <Grid
                                             Margin="{StaticResource SmallTopMargin}">
@@ -114,14 +128,14 @@
                                             </Grid.ColumnDefinitions>
 
                                             <ProgressBar
-                                                Value="{x:Bind Progress, Mode=OneWay}"
-                                                Maximum="{x:Bind MaximumProgress, Mode=OneWay}" />
+                                                Value="{x:Bind Task.Progress, Mode=OneWay}"
+                                                Maximum="{x:Bind Task.MaximumProgress, Mode=OneWay}" />
                                             <TextBlock
                                                 Grid.Column="1"
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Right"
-                                                Text="{x:Bind ProgressText, Mode=OneWay}" />
-                                        </Grid> 
+                                                Text="{x:Bind Task.ProgressText, Mode=OneWay}" />
+                                        </Grid>
                                     </StackPanel>
                                 </ListViewItem>
                             </DataTemplate>

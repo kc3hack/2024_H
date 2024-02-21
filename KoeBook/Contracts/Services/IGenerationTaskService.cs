@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using KoeBook.Models;
+﻿using KoeBook.Models;
 
 namespace KoeBook.Contracts.Services;
 
 public interface IGenerationTaskService
 {
-    ObservableCollection<GenerationTask> Tasks { get; }
+    IReadOnlyList<GenerationTask> Tasks { get; }
 
     event Action<GenerationTask, ChangedEvents>? OnTasksChanged;
 
