@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="KoeBook.Components.StateProgressBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush
+                        x:Key="DoneBackground"
+                        Color="{StaticResource SystemAccentColorDark3}" />
+                    <SolidColorBrush
+                        x:Key="CurrentBackground"
+                        Color="{StaticResource SystemAccentColorDark2}" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush
+                        x:Key="DoneBackground"
+                        Color="{StaticResource SystemAccentColorLight3}" />
+                    <SolidColorBrush
+                        x:Key="CurrentBackground"
+                        Color="{StaticResource SystemAccentColorLight2}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal">
+        <Grid
+            BorderBrush="{ThemeResource CardStrokeColorDefaultSolid}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Height="22">
+            <StackPanel Orientation="Horizontal">
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(-1), Mode=OneWay}"
+                    Fill="{ThemeResource DoneBackground}" />
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(0), Mode=OneWay}"
+                    Fill="{ThemeResource CurrentBackground}"/>
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(1), Mode=OneWay}"
+                    Fill="{ThemeResource SystemControlBackgroundBaseLowRevealBackgroundBrush}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="待機中" />
+                <TextBlock
+                    Visibility="{x:Bind DownloadingVisibility}"
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="ダウンロード中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="解析中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="音声生成中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="出力中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="生成完了" />
+            </StackPanel>
+        </Grid>
+
+        <Grid
+            Visibility="{x:Bind FailedVisbility}"
+            CornerRadius="12"
+            Padding="10,0,10,0"
+            Margin="{StaticResource SmallLeftMargin}"
+            Height="22"
+            Background="{ThemeResource SystemControlErrorBackgroundColor}">
+            <TextBlock
+                Foreground="{ThemeResource SystemErrorTextColor}"
+                TextAlignment="Center"
+                Text="生成失敗" />
+        </Grid>
+    </StackPanel>
+</UserControl>

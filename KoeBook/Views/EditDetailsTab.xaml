@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabViewItem
+    x:Class="KoeBook.Views.EditDetailsTab"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:components="using:KoeBook.Components"
+    mc:Ignorable="d"
+
+    Header="{x:Bind ViewModel.Task.Title}"
+>
+    <TabViewItem.IconSource>
+        <SymbolIconSource Symbol="Edit" />
+    </TabViewItem.IconSource>
+    <TabViewItem.Content>
+        <Grid Margin="20,10,20,0">
+            <ScrollView
+                x:Name="ContentArea"
+                ZoomMode="Disabled"
+                HorizontalScrollMode="Disabled">
+                <StackPanel>
+                    <TextBlock
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Text="{x:Bind ViewModel.TabTitle, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Margin="{StaticResource MediumTopMargin}"
+                        Text="ステータス" />
+
+                    <StackPanel
+                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        Padding="12,8,12,8"
+                        CornerRadius="12"
+                        Margin="{StaticResource SmallTopMargin}">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="書籍名"
+                            ToolTipService.ToolTip="解析が終了するまではファイル名またはURLとなります"/>
+                        <TextBlock
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            Text="{x:Bind ViewModel.Task.Title, Mode=OneWay}"/>
+
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Margin="{StaticResource XSmallTopMargin}"
+                            Text="{x:Bind ViewModel.Task.SourceDescription}" />
+                        <TextBlock
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            Text="{x:Bind ViewModel.Task.Source}" />
+
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Margin="{StaticResource XSmallTopMargin}"
+                            Text="実行状況"
+                            ToolTipService.ToolTip=""/>
+                        <components:StateProgressBar
+                            HorizontalAlignment="Left"
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            State="{x:Bind ViewModel.Task.State, Mode=OneWay}"
+                            SourceType="{x:Bind ViewModel.Task.SourceType}"/>
+                        <Grid
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="160" />
+                            </Grid.ColumnDefinitions>
+
+                            <ProgressBar
+                                Value="{x:Bind ViewModel.Task.Progress, Mode=OneWay}"
+                                Maximum="{x:Bind ViewModel.Task.MaximumProgress, Mode=OneWay}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                Text="{x:Bind ViewModel.Task.ProgressText, Mode=OneWay}" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollView>
+        </Grid>
+    </TabViewItem.Content>
+</TabViewItem>
