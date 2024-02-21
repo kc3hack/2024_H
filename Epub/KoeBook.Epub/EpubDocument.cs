@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 
@@ -11,7 +12,19 @@ public class EpubDocument(string title, string author)
 
     public string CoverFilePath { get; set; } = "";
 
-    public List<CssClass>? CssStyles { get; set; }
+    public List<CssClass> CssClasses { get; set; } = [
+            new CssClass("-epub-media-overlay-active","""
+                .-epub-media-overlay-active *{
+                    background-color: yellow;
+                    color: black !important;
+                }
+                """),
+            new CssClass("-epub-media-overlay-unactive","""
+                .-epub-media-overlay-unactive * {
+                    color: gray;
+                }
+                """),
+        ];
     public List<Chapter> Chapters { get; set; } = [];
 
     public string CreateNavXhtml()
@@ -67,6 +80,16 @@ public class EpubDocument(string title, string author)
                 </body>
             </html>
             """);
+        return builder.ToString();
+    }
+
+    public string CreateCssText()
+    {
+        var builder = new StringBuilder();
+        foreach(var cssClass in CssClasses)
+        {
+            builder.AppendLine(cssClass.Text);
+        }
         return builder.ToString();
     }
 }
