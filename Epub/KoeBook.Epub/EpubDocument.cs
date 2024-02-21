@@ -10,6 +10,6 @@ public class EpubDocument(string title, string author)
 
     public string CoverFilePath { get; set; } = "";
 
-    public List<CssStyle>? CssStyles { get; set; }
+    public List<CssClass>? CssStyles { get; set; }
     public List<Chapter>? Chapters { get; set; }
 }
