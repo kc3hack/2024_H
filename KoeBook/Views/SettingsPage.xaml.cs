@@ -16,9 +16,4 @@ public sealed partial class SettingsPage : Page
         ViewModel = App.GetService<SettingsViewModel>();
         InitializeComponent();
     }
-
-    private async void Page_Loaded(object _, Microsoft.UI.Xaml.RoutedEventArgs __)
-    {
-        await ViewModel.OnLoaded();
-    }
 }

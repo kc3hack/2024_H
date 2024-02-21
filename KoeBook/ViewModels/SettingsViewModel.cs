@@ -78,7 +78,7 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-    public async ValueTask OnLoaded()
+    public async void OnLoaded(object _, RoutedEventArgs __)
     {
         var key = await _localSettingsService.GetApiKeyAsync(default);
         if (key is not null)

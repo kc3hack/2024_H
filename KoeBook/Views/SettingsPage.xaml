@@ -8,7 +8,7 @@
     xmlns:helpers="using:KoeBook.Helpers"
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
-    Loaded="Page_Loaded">
+    Loaded="{x:Bind ViewModel.OnLoaded}">
     <Page.Resources>
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
