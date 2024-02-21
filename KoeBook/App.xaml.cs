@@ -64,7 +64,7 @@ public partial class App : Application
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
             services.AddTransient<INavigationViewService, NavigationViewService>();
-            services.AddTransient<ITabViewService, TabViewService>();
+            services.AddSingleton<ITabViewService, TabViewService>();
 
             services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
             services.AddSingleton<IActivationService, ActivationService>();
@@ -83,6 +83,7 @@ public partial class App : Application
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
+            services.AddTransient<EditDetailsViewModel>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

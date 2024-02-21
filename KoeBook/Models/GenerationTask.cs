@@ -11,6 +11,13 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
 
     public SourceType SourceType { get; } = sourceType;
 
+    public string SourceDescription => SourceType switch
+    {
+        SourceType.Url => "URL",
+        SourceType.FilePath => "ファイルパス",
+        _ => string.Empty,
+    };
+
     [ObservableProperty]
     private string _title = sourceType == SourceType.FilePath ? Path.GetFileName(source) : source;
 
