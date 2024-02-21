@@ -8,7 +8,7 @@ public sealed class Section
     public string Title { get; set; }
     public List<Element> Elements { get; set; } = [];
 
-    internal Section(string title)
+    public Section(string title)
     {
         Title = title;
         Id = Guid.NewGuid().ToString();

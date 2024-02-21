@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoeBook.Contracts.Services;
-using KoeBook.Models;
+using KoeBook.Core.Models;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -86,9 +86,9 @@ public sealed partial class MainViewModel : ObservableRecipient
         }
 
         var source = EbookFilePath ?? EbookUrl!;
+        _taskService.Register(new(Guid.NewGuid(), source, EbookFilePath is null ? SourceType.Url : SourceType.FilePath));
         EbookFilePath = null;
         EbookUrl = null;
-        _taskService.Register(new(Guid.NewGuid(), source, SourceType.FilePath));
     }
 
     public async void BeforeTextChanging(TextBox _, TextBoxBeforeTextChangingEventArgs args)

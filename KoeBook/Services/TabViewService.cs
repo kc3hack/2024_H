@@ -58,23 +58,15 @@ public class TabViewService : ITabViewService
         return null;
     }
 
-    public TabViewItem? GetOrCreateTab(GenerationTask processingTask)
+    public TabViewItem? GetOrCreateTab(GenerationTask task)
     {
         if (_tabView is null)
             return null;
 
-        var tab = GetExistingTab(processingTask.Id);
+        var tab = GetExistingTab(task.Id);
         if (tab is null)
         {
-            var frame = new Frame
-            {
-                Margin = TabContentThickness,
-            };
-            tab = new TabViewItem()
-            {
-                Content = frame,
-                Header = processingTask.Id,
-            };
+            tab = new EditDetailsTab(task);
             _tabView.TabItems.Add(tab);
         }
 

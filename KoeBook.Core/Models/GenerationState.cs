@@ -1,11 +1,12 @@
 ﻿using System.Runtime.Serialization;
 
-namespace KoeBook.Models;
+namespace KoeBook.Core.Models;
 
 public enum GenerationState
 {
+    // 0~5 はStateProgressBarが依存しているので変更しないこと
     [EnumMember(Value = "待機中")]
-    Waiting,
+    Waiting = 0,
 
     [EnumMember(Value = "ダウンロード中")]
     Downloading,

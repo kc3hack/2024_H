@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using FastEnumUtility;
+using KoeBook.Core.Models;
 
 namespace KoeBook.Models;
 
@@ -10,6 +11,13 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
     public string Source { get; } = source;
 
     public SourceType SourceType { get; } = sourceType;
+
+    public string SourceDescription => SourceType switch
+    {
+        SourceType.Url => "URL",
+        SourceType.FilePath => "ファイルパス",
+        _ => string.Empty,
+    };
 
     [ObservableProperty]
     private string _title = sourceType == SourceType.FilePath ? Path.GetFileName(source) : source;
