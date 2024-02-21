@@ -1,19 +1,20 @@
 ﻿using KoeBook.ViewModels;
-
 using Microsoft.UI.Xaml.Controls;
 
 namespace KoeBook.Views;
 
 public sealed partial class MainPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
+    public static readonly Guid Id = Guid.NewGuid();
+
+    public MainViewModel ViewModel { get; }
+
+    public TaskListViewModel TaskListViewModel { get; }
 
     public MainPage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        TaskListViewModel = App.GetService<TaskListViewModel>();
         InitializeComponent();
     }
 }

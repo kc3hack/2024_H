@@ -1,51 +1,21 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-
+using CommunityToolkit.Mvvm.Input;
 using KoeBook.Contracts.Services;
-using KoeBook.Views;
-
-using Microsoft.UI.Xaml.Navigation;
 
 namespace KoeBook.ViewModels;
 
 public partial class ShellViewModel : ObservableRecipient
 {
-    [ObservableProperty]
-    private bool isBackEnabled;
+    public ITabViewService TabViewService { get; }
 
-    [ObservableProperty]
-    private object? selected;
-
-    public INavigationService NavigationService
+    public ShellViewModel(ITabViewService tabViewService)
     {
-        get;
+        TabViewService = tabViewService;
     }
 
-    public INavigationViewService NavigationViewService
+    [RelayCommand]
+    private void OnOpenSettingsTab()
     {
-        get;
-    }
-
-    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
-    {
-        NavigationService = navigationService;
-        NavigationService.Navigated += OnNavigated;
-        NavigationViewService = navigationViewService;
-    }
-
-    private void OnNavigated(object sender, NavigationEventArgs e)
-    {
-        IsBackEnabled = NavigationService.CanGoBack;
-
-        if (e.SourcePageType == typeof(SettingsPage))
-        {
-            Selected = NavigationViewService.SettingsItem;
-            return;
-        }
-
-        var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
-        if (selectedItem != null)
-        {
-            Selected = selectedItem;
-        }
+        TabViewService.Focus(TabViewService.GetOrCreateSettings());
     }
 }

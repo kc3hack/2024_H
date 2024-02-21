@@ -1,30 +1,29 @@
-using KoeBook.Contracts.Services;
+﻿using KoeBook.Contracts.Services;
 using KoeBook.Helpers;
 using KoeBook.ViewModels;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 
 using Windows.System;
 
 namespace KoeBook.Views;
 
-// TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page
 {
-    public ShellViewModel ViewModel
-    {
-        get;
-    }
+    public ShellViewModel ViewModel { get; }
 
     public ShellPage(ShellViewModel viewModel)
     {
         ViewModel = viewModel;
         InitializeComponent();
 
+        TabHelper.SetNavigateTo(MainPageTab, MainPage.Id);
+
+        ViewModel.TabViewService.Initialize(MainTabView);
         App.MainWindow.ExtendsContentIntoTitleBar = true;
+        App.MainWindow.SetTitleBar(AppTitleBar);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

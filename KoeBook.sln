@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KoeBook", "KoeBook\KoeBook.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KoeBook.Core", "KoeBook.Core\KoeBook.Core.csproj", "{50444E76-C6A7-40AF-879C-0AD88A287510}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoeBook.Common", "KoeBook.Common\KoeBook.Common.csproj", "{1E5B40AE-1D42-40D0-85D1-E921B17BFA69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KoeBook.Common", "KoeBook.Common\KoeBook.Common.csproj", "{1E5B40AE-1D42-40D0-85D1-E921B17BFA69}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KoeBook.Epub", "Epub\KoeBook.Epub\KoeBook.Epub.csproj", "{1DE55F58-E4F3-4077-A241-AFFD736A2B01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoeBook.Test", "KoeBook.Test\KoeBook.Test.csproj", "{67CEB31C-B026-499A-83B4-528914EABDBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,22 @@ Global
 		{1DE55F58-E4F3-4077-A241-AFFD736A2B01}.Release|x64.Build.0 = Release|Any CPU
 		{1DE55F58-E4F3-4077-A241-AFFD736A2B01}.Release|x86.ActiveCfg = Release|Any CPU
 		{1DE55F58-E4F3-4077-A241-AFFD736A2B01}.Release|x86.Build.0 = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|arm64.Build.0 = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|x64.Build.0 = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Debug|x86.Build.0 = Debug|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|arm64.ActiveCfg = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|arm64.Build.0 = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|x64.ActiveCfg = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|x64.Build.0 = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|x86.ActiveCfg = Release|Any CPU
+		{67CEB31C-B026-499A-83B4-528914EABDBF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,22 +9,40 @@
     xmlns:behaviors="using:KoeBook.Behaviors"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     Loaded="OnLoaded">
-
-    <TabView
+    
+    <Grid>
+        <TabView
+            x:Name="MainTabView"
             Canvas.ZIndex="0"
-            SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}">
-        <TabView.TabItems>
-            <TabViewItem x:Uid="Shell_Main">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="Page"/>
-                </TabViewItem.IconSource>
-                <local:MainPage/>
-            </TabViewItem>
-        </TabView.TabItems>
-        <TabView.TabStripFooter>
-            <Button HorizontalAlignment="Right" Margin="0,0,140,0">
-                <SymbolIcon Symbol="Setting" />
-            </Button>
-        </TabView.TabStripFooter>
-    </TabView>
+            IsAddTabButtonVisible="False">
+            <TabView.TabItems>
+                <TabViewItem
+                    x:Name="MainPageTab"
+                    IsClosable="False"
+                    Header="ホーム">
+                    <TabViewItem.IconSource>
+                        <SymbolIconSource Symbol="Home"/>
+                    </TabViewItem.IconSource>
+                    <local:MainPage x:Name="MainPage" Margin="20,20,20,0"/>
+                </TabViewItem>
+            </TabView.TabItems>
+            <TabView.TabStripHeader>
+                <Button
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="4,0,0,0"
+                    Command="{x:Bind ViewModel.OpenSettingsTabCommand}"
+                    CommandParameter="{x:Bind MainTabView}">
+                    <SymbolIcon Symbol="Setting" />
+                </Button>
+            </TabView.TabStripHeader>
+            <TabView.TabStripFooter>
+                <Grid
+                    x:Name="AppTitleBar"
+                    MaxHeight="{Binding ElementName=MainTabView, Path=ActualHeight}" 
+                    IsHitTestVisible="True">
+                </Grid>
+            </TabView.TabStripFooter>
+        </TabView>
+    </Grid>
 </Page>
