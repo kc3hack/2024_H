@@ -5,12 +5,25 @@ namespace KoeBook.Services;
 
 public class GenerationTaskService : IGenerationTaskService
 {
-    private readonly List<GenerationTask> _tasks = [
-        new(Guid.NewGuid(), "book.epub", SourceType.FilePath){
-         Progress = 30,
-         MaximumProgress = 100,
-          State = GenerationState.Analyzing,
-        }];
+    private readonly List<GenerationTask> _tasks =
+#if DEBUG
+        [
+            new(Guid.NewGuid(), "book.epub", SourceType.FilePath)
+            {
+                Progress = 30,
+                MaximumProgress = 100,
+                State = GenerationState.Analyzing,
+            },
+            new(Guid.NewGuid(), "https://example.com", SourceType.Url)
+            {
+                Progress = 0,
+                MaximumProgress = 0,
+                State = GenerationState.Failed,
+            },
+        ];
+#else
+        [];
+#endif
 
     public IReadOnlyList<GenerationTask> Tasks => _tasks;
 

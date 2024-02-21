@@ -9,6 +9,8 @@ namespace KoeBook.Components;
 
 public sealed partial class StateProgressBar : UserControl, INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public static readonly DependencyProperty StateProperty = DependencyProperty.Register(
         nameof(State),
         typeof(GenerationState),
@@ -20,9 +22,14 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
         get => (GenerationState)GetValue(StateProperty);
         set
         {
-            SetValue(StateProperty, value);
-            OnPropertyChanged(nameof(BackgroundPosition));
-            OnPropertyChanged(nameof(BackgroundWidth));
+            if (State != value)
+            {
+                SetValue(StateProperty, value);
+                OnPropertyChanged(nameof(BackgroundPosition));
+                OnPropertyChanged(nameof(BackgroundWidth));
+                OnPropertyChanged(nameof(ProccessingVisibility));
+                OnPropertyChanged(nameof(FailedVisbility));
+            }
         }
     }
 
@@ -30,15 +37,12 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
 
     public Visibility GrayoutDownloading => SourceType == SourceType.FilePath ? Visibility.Visible : Visibility.Collapsed;
 
-    private readonly IThemeSelectorService _themeSelectorService;
+    public Visibility ProccessingVisibility => State == GenerationState.Failed ? Visibility.Collapsed : Visibility.Visible;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private static readonly UISettings _uiSettings = new();
+    public Visibility FailedVisbility => State == GenerationState.Failed ? Visibility.Visible : Visibility.Collapsed;
 
     public StateProgressBar()
     {
-        _themeSelectorService = App.GetService<IThemeSelectorService>();
         InitializeComponent();
     }
 
@@ -50,6 +54,9 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
     public int BackgroundWidth(int position)
     {
         var state = State;
+        if (state == GenerationState.Failed)
+            return 5;
+
         var width = position switch
         {
             < 0 => (int)state,
@@ -62,6 +69,9 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
     public int BackgroundPosition(int position)
     {
         var state = State;
+        if (state == GenerationState.Failed)
+            return 0;
+
         return position switch
         {
             < 0 => 0,
