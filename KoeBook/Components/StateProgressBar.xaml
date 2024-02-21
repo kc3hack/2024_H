@@ -34,71 +34,57 @@
             BorderBrush="{ThemeResource CardStrokeColorDefaultSolid}"
             BorderThickness="1"
             CornerRadius="12"
-            Height="22"
-            MinWidth="400">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Rectangle
-                Visibility="{x:Bind ProccessingVisibility, Mode=OneWay}"
-                Grid.Column="0"
-                Grid.ColumnSpan="{x:Bind BackgroundWidth(-1), Mode=OneWay}"
-                Fill="{ThemeResource DoneBackground}" />
-            <Rectangle
-                Grid.Column="{x:Bind BackgroundPosition(1), Mode=OneWay}"
-                Grid.ColumnSpan="{x:Bind BackgroundWidth(1), Mode=OneWay}"
-                Fill="{ThemeResource SystemControlBackgroundBaseLowRevealBackgroundBrush}"/>
-            <Rectangle
-                Visibility="{x:Bind ProccessingVisibility, Mode=OneWay}"
-                Grid.Column="{x:Bind BackgroundPosition(0), Mode=OneWay}"
-                Grid.ColumnSpan="1"
-                Fill="{ThemeResource CurrentBackground}"/>
-
-            <TextBlock
-                HorizontalAlignment="Center"
-                Text="待機中" />
-            <TextBlock
-                Grid.Column="1"
-                HorizontalAlignment="Center"
-                Text="ダウンロード中" />
-            <Rectangle
-                Grid.Column="1"
-                Visibility="{x:Bind GrayoutDownloading}"
-                Fill="{ThemeResource SystemControlBackgroundAltMediumBrush}" />
-            <TextBlock
-                Grid.Column="1"
-                Visibility="{x:Bind GrayoutDownloading}"
-                Foreground="{ThemeResource SystemControlForegroundBaseLowBrush}"
-                HorizontalAlignment="Center"
-                Text="ダウンロード中" />
-            <TextBlock
-                Grid.Column="2"
-                HorizontalAlignment="Center"
-                Text="解析中" />
-            <TextBlock
-                Grid.Column="3"
-                HorizontalAlignment="Center"
-                Text="音声生成中" />
-            <TextBlock
-                Grid.Column="4"
-                HorizontalAlignment="Center"
-                Text="出力完了" />
+            Height="22">
+            <StackPanel Orientation="Horizontal">
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(-1), Mode=OneWay}"
+                    Fill="{ThemeResource DoneBackground}" />
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(0), Mode=OneWay}"
+                    Fill="{ThemeResource CurrentBackground}"/>
+                <Rectangle
+                    Width="{x:Bind BackgroundWidth(1), Mode=OneWay}"
+                    Fill="{ThemeResource SystemControlBackgroundBaseLowRevealBackgroundBrush}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="待機中" />
+                <TextBlock
+                    Visibility="{x:Bind DownloadingVisibility}"
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="ダウンロード中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="解析中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="音声生成中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="出力中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
+                    Text="生成完了" />
+            </StackPanel>
         </Grid>
 
         <Grid
             Visibility="{x:Bind FailedVisbility}"
             CornerRadius="12"
-            Padding="5,0,5,0"
+            Padding="10,0,10,0"
             Margin="{StaticResource SmallLeftMargin}"
             Height="22"
             Background="{ThemeResource SystemControlErrorBackgroundColor}">
             <TextBlock
                 Foreground="{ThemeResource SystemErrorTextColor}"
+                TextAlignment="Center"
                 Text="生成失敗" />
         </Grid>
     </StackPanel>

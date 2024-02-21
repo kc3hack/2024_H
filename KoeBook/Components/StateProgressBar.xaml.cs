@@ -25,19 +25,14 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
             if (State != value)
             {
                 SetValue(StateProperty, value);
-                OnPropertyChanged(nameof(BackgroundPosition));
                 OnPropertyChanged(nameof(BackgroundWidth));
-                OnPropertyChanged(nameof(ProccessingVisibility));
-                OnPropertyChanged(nameof(FailedVisbility));
             }
         }
     }
 
     public SourceType SourceType { get; set; }
 
-    public Visibility GrayoutDownloading => SourceType == SourceType.FilePath ? Visibility.Visible : Visibility.Collapsed;
-
-    public Visibility ProccessingVisibility => State == GenerationState.Failed ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility DownloadingVisibility => SourceType != SourceType.FilePath ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility FailedVisbility => State == GenerationState.Failed ? Visibility.Visible : Visibility.Collapsed;
 
@@ -51,32 +46,33 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
         PropertyChanged?.Invoke(this, new(propertyName));
     }
 
-    public int BackgroundWidth(int position)
+    public double BackgroundWidth(int position)
     {
+        const int ItemWidth = 80;
         var state = State;
         if (state == GenerationState.Failed)
-            return 5;
+            return position <= 0 ? 0 : SourceType == SourceType.FilePath ? ItemWidth * 5 : ItemWidth * 6;
 
-        var width = position switch
+        if (SourceType != SourceType.FilePath)
         {
-            < 0 => (int)state,
-            0 => 1,
-            > 0 => 5 - (int)state,
-        };
-        return int.Max(1, width);
-    }
-
-    public int BackgroundPosition(int position)
-    {
-        var state = State;
-        if (state == GenerationState.Failed)
-            return 0;
-
-        return position switch
+            return position switch
+            {
+                < 0 => (int)state * ItemWidth,
+                0 => ItemWidth,
+                > 0 => (5 - (int)state) * ItemWidth,
+            };
+        }
+        else
         {
-            < 0 => 0,
-            0 => (int)state,
-            > 0 => state == GenerationState.Completed ? 5 : 1 + (int)state,
-        };
+            if (state > GenerationState.Downloading)
+                state -= 1;
+
+            return position switch
+            {
+                < 0 => (int)state * ItemWidth,
+                0 => ItemWidth,
+                > 0 => (4 - (int)state) * ItemWidth,
+            };
+        }
     }
 }
