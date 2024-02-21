@@ -1,6 +1,6 @@
 ﻿namespace KoeBook.Epub;
 
-public sealed class Section 
+public sealed class Section
 {
     public string Id { get; }
     public string Title { get; set; } = "";
