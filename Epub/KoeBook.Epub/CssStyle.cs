@@ -1,7 +1,3 @@
 ﻿namespace KoeBook.Epub;
 
-public class CssStyle
-{
-    public string? Name { get; set; }
-    public string? Text { get; set; }
-}
+public record CssStyle(string Name, string Text);
