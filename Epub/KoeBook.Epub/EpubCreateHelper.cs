@@ -7,7 +7,7 @@ internal static class EpubCreateHelper
         return Path.GetExtension(path) switch
         {
             ".gif" => "image/gif",
-            ".jpg" or "jpeg" => "image/jpeg",
+            ".jpg" or ".jpeg" => "image/jpeg",
             ".png" => "image/png",
             ".svg" => "image/svg+xml",
             ".webp" => "image/webp",
