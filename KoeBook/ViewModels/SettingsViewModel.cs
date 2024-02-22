@@ -53,16 +53,6 @@ public partial class SettingsViewModel : ObservableRecipient
         _versionDescription = GetVersionDescription();
     }
 
-    [RelayCommand]
-    private async Task SwitchThemeAsync(ElementTheme param)
-    {
-        if (ElementTheme != param)
-        {
-            ElementTheme = param;
-            await _themeSelectorService.SetThemeAsync(param);
-        }
-    }
-
     public async void OnThemeChangedAsync(object _, SelectionChangedEventArgs __)
     {
         await _themeSelectorService.SetThemeAsync(ElementTheme);
