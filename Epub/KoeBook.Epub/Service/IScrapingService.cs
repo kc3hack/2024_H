@@ -2,5 +2,5 @@
 
 public interface IScrapingService
 {
-    public Task<EpubDocument> ScrapingAsync(string url, string coverFil9lePath, CancellationToken ct);
+    public Task<EpubDocument> ScrapingAsync(string url, string coverFil9lePath, Guid id, CancellationToken ct);
 }
