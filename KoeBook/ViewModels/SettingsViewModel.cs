@@ -5,10 +5,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using KoeBook.Contracts.Services;
+using KoeBook.Core.Contracts.Services;
 using KoeBook.Helpers;
 
 using Microsoft.UI.Xaml;
-
+using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel;
 
 namespace KoeBook.ViewModels;
@@ -17,29 +18,61 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
 
+    private readonly ILocalSettingsService _localSettingsService;
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectedThemeIndex))]
     private ElementTheme _elementTheme;
+
+    public int SelectedThemeIndex
+    {
+        get => (int)ElementTheme;
+        set => ElementTheme = (ElementTheme)value;
+    }
+
+    [ObservableProperty]
+    private string _apiKey = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ApiKeyRevealMode))]
+    [NotifyPropertyChangedFor(nameof(ApiKeyDescription))]
+    private bool _revealApiKey;
+
+    public PasswordRevealMode ApiKeyRevealMode => RevealApiKey ? PasswordRevealMode.Visible : PasswordRevealMode.Hidden;
+
+    public string ApiKeyDescription => RevealApiKey ? "表示" : "非表示";
 
     [ObservableProperty]
     private string _versionDescription;
 
-    public ICommand SwitchThemeCommand { get; }
-
-    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, ILocalSettingsService localSettingsService)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
+        _localSettingsService = localSettingsService;
         _versionDescription = GetVersionDescription();
+    }
 
-        SwitchThemeCommand = new RelayCommand<ElementTheme>(
-            async (param) =>
-            {
-                if (ElementTheme != param)
-                {
-                    ElementTheme = param;
-                    await _themeSelectorService.SetThemeAsync(param);
-                }
-            });
+    public async void OnThemeChangedAsync(object _, SelectionChangedEventArgs __)
+    {
+        await _themeSelectorService.SetThemeAsync(ElementTheme);
+    }
+
+    partial void OnApiKeyChanged(string value)
+    {
+        Core(_localSettingsService, value);
+
+        static async void Core(ILocalSettingsService service, string value)
+        {
+            await service.SaveApiKeyAsync(value, default);
+        }
+    }
+
+    public async void OnLoaded(object _, RoutedEventArgs __)
+    {
+        var key = await _localSettingsService.GetApiKeyAsync(default);
+        if (key is not null)
+            ApiKey = key;
     }
 
     private static string GetVersionDescription()
@@ -57,6 +90,6 @@ public partial class SettingsViewModel : ObservableRecipient
             version = Assembly.GetExecutingAssembly().GetName().Version!;
         }
 
-        return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        return $"KoeBook - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
 }
