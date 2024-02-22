@@ -37,6 +37,7 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StateText))]
     [NotifyPropertyChangedFor(nameof(SkipEditChangable))]
+    [NotifyPropertyChangedFor(nameof(Editable))]
     private GenerationState _state;
 
     public string StateText => State.GetEnumMemberValue()!;
@@ -59,6 +60,8 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
     private bool _skipEdit = skipEdit;
 
     public bool SkipEditChangable => State < GenerationState.Editting;
+
+    public bool Editable => State == GenerationState.Editting;
 
     [ObservableProperty]
     private BookScripts? _bookScripts;

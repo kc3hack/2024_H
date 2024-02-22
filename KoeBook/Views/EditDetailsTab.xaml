@@ -14,7 +14,7 @@
         <SymbolIconSource Symbol="Edit" />
     </TabViewItem.IconSource>
     <TabViewItem.Content>
-        <Grid Margin="20,10,20,0">
+        <Grid Margin="20,10,20,10">
             <ScrollView
                 x:Name="ContentArea"
                 ZoomMode="Disabled"
@@ -90,6 +90,17 @@
                                 HorizontalAlignment="Right"
                                 Text="{x:Bind ViewModel.Task.ProgressText, Mode=OneWay}" />
                         </Grid>
+
+                        <Button
+                            Margin="{StaticResource SmallTopMargin}"
+                            Command="{x:Bind ViewModel.StartGenerationAsyncCommand}"
+                            IsEnabled="{x:Bind ViewModel.Task.Editable, Mode=OneWay}"
+                            Style="{ThemeResource ButtonRevealStyle}"
+                            Content="生成開始"/>
+                        <TextBlock
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            Style="{ThemeResource CaptionTextBlockStyle}"
+                            Text="編集はできなくなります" />
                     </StackPanel>
 
                     <TextBlock
@@ -97,7 +108,8 @@
                         Margin="{StaticResource MediumTopMargin}"
                         Text="モデル設定"/>
                     <TextBlock
-                        Margin="{StaticResource XXSmallTopMargin}"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
                         Text="キャラクターごとにどのモデルを使用するか設定します。"/>
 
                     <StackPanel
@@ -107,6 +119,11 @@
                         Padding="12,8,12,8"
                         CornerRadius="12"
                         Margin="{StaticResource SmallTopMargin}">
+                        <TextBlock
+                            Visibility="{x:Bind ViewModel.AnalyzingTextVisibility, Mode=OneWay}"
+                            Margin="0,12,0,12"
+                            TextAlignment="Center"
+                            Text="解析が終了していないため表示できません。"/>
                         <ItemsRepeater
                             ItemsSource="{x:Bind ViewModel.BookScripts.CharacterMapping, Mode=OneWay}">
                             <ItemsRepeater.Layout>
@@ -127,8 +144,65 @@
                                             <ComboBox
                                                 Grid.Column="1"
                                                 Width="360"
+                                                IsEnabled="{x:Bind Editable, Mode=OneWay}"
                                                 ItemsSource="{x:Bind AllowedModels}"
                                                 SelectedItem="{x:Bind Model, Mode=TwoWay}"/>
+                                        </Grid>
+                                    </ItemContainer>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Margin="{StaticResource MediumTopMargin}"
+                        Text="スタイル設定"/>
+                    <TextBlock
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                        Text="スタイル (喜怒哀楽) を設定します。"/>
+
+                    <StackPanel
+                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        Padding="12,8,12,8"
+                        CornerRadius="12"
+                        Margin="{StaticResource SmallTopMargin}">
+                        <TextBlock
+                            Visibility="{x:Bind ViewModel.AnalyzingTextVisibility, Mode=OneWay}"
+                            Margin="0,12,0,12"
+                            TextAlignment="Center"
+                            Text="解析が終了していないため表示できません。"/>
+
+                        <ItemsRepeater
+                            ItemsSource="{x:Bind ViewModel.BookScripts.ScriptLines, Mode=OneWay}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Orientation="Vertical" Spacing="2" />
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="editViewmodel:ScriptLineViewModel">
+                                    <ItemContainer>
+                                        <Grid
+                                            Padding="10,5,10,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="180" />
+                                                <ColumnDefinition Width="180" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind Character}"/>
+                                            <ComboBox
+                                                Grid.Column="1"
+                                                Width="160"
+                                                SelectedItem="{x:Bind Style, Mode=TwoWay}"
+                                                ItemsSource="{x:Bind AllowedStyles, Mode=OneWay}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind Text}"/>
                                         </Grid>
                                     </ItemContainer>
                                 </DataTemplate>

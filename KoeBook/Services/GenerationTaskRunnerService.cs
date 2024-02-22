@@ -62,9 +62,42 @@ public class GenerationTaskRunnerService
         {
             task.State = GenerationState.Failed;
         }
-        catch (Exception)
+        catch
         {
             task.State = GenerationState.Failed;
         }
+    }
+
+    public async void RunGenerateEpubAsync(GenerationTask task)
+    {
+        if (task.CancellationToken.IsCancellationRequested || task.State == GenerationState.Failed || task.BookScripts is null)
+            return;
+        try
+        {
+            var resultPath = await _epubGenService.GenerateEpubAsync(task.BookScripts, _tempFolder, task.CancellationToken);
+            task.State = GenerationState.Completed;
+            task.Progress = 1;
+            task.MaximumProgress = 1;
+        }
+        catch (OperationCanceledException)
+        {
+            task.State = GenerationState.Failed;
+        }
+        catch
+        {
+            task.State = GenerationState.Failed;
+        }
+    }
+
+    public void StopTask(GenerationTask task)
+    {
+        task.CancellationTokenSource.Cancel();
+        if (task.State != GenerationState.Completed)
+        {
+            task.State = GenerationState.Failed;
+            task.Progress = 0;
+            task.MaximumProgress = 0;
+        }
+        _taskService.Unregister(task.Id);
     }
 }

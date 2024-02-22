@@ -12,8 +12,8 @@ namespace KoeBook.ViewModels;
 public sealed partial class MainViewModel : ObservableRecipient
 {
     private readonly IGenerationTaskService _taskService;
-
     private readonly IDialogService _dialogService;
+    private readonly ILocalSettingsService _localSettingsService;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EbookFileName))]
@@ -31,10 +31,20 @@ public sealed partial class MainViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _skipEdit = true;
 
-    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService, GenerationTaskRunnerService _)
+    const string SkipEditSettingsKey = "SkipEdit";
+
+    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService, ILocalSettingsService localSettingsService, GenerationTaskRunnerService _)
     {
         _taskService = taskService;
         _dialogService = dialogService;
+        _localSettingsService = localSettingsService;
+
+        InitializeAsync(); // 必ず最後に実行すること
+    }
+
+    private async void InitializeAsync()
+    {
+        SkipEdit = await _localSettingsService.ReadSettingAsync<bool?>(SkipEditSettingsKey) ?? true;
     }
 
     [RelayCommand]
@@ -112,6 +122,16 @@ public sealed partial class MainViewModel : ObservableRecipient
         {
             args.Cancel = true;
             EbookUrl = string.Empty;
+        }
+    }
+
+    partial void OnSkipEditChanged(bool value)
+    {
+        CoreAsync(_localSettingsService, value);
+
+        static async void CoreAsync(ILocalSettingsService settingsService, bool skipEdit)
+        {
+            await settingsService.SaveSettingAsync(SkipEditSettingsKey, skipEdit);
         }
     }
 }

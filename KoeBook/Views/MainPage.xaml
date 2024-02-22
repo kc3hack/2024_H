@@ -125,6 +125,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
                                             <Grid
@@ -148,8 +149,16 @@
                                             <Button
                                                 Grid.Column="2"
                                                 VerticalAlignment="Center"
+                                                Margin="{StaticResource SmallLeftMargin}"
                                                 Content="詳細"
                                                 Command="{x:Bind OpenEditTabCommand}"/>
+                                            <Button
+                                                Grid.Column="3"
+                                                VerticalAlignment="Center"
+                                                Margin="{StaticResource SmallLeftMargin}"
+                                                Command="{x:Bind StopTaskCommand}">
+                                                <SymbolIcon Symbol="Cancel" />
+                                            </Button>
                                         </Grid>
 
                                         <Grid

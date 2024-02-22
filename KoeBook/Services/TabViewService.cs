@@ -14,7 +14,7 @@ public class TabViewService : ITabViewService
 
     private TabView? _tabView;
 
-    private Thickness TabContentThickness => new(20, 10, 20, 0);
+    private Thickness TabContentThickness => new(20, 10, 20, 10);
 
     public TabViewService(IGenerationTaskService processingTaskService)
     {

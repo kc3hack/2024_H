@@ -15,18 +15,18 @@ public class AnalyzerServiceMock(IDisplayStateChangeService stateService) : IAna
         if (bookProperties.SourceType == SourceType.Url)
         {
             stateChanging = _stateService.ResetProgress(bookProperties, GenerationState.Downloading, 300);
-            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
-            stateChanging.UpdateProgress(30);
             await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
+            stateChanging.UpdateProgress(30);
+            await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
             stateChanging.UpdateProgress(100);
-            await Task.Delay(4000, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
             stateChanging.UpdateProgress(300);
         }
 
         stateChanging = _stateService.ResetProgress(bookProperties, GenerationState.Analyzing, 400);
-        await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+        await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
         stateChanging.UpdateProgress(240);
-        await Task.Delay(6000, cancellationToken).ConfigureAwait(false);
+        await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
         stateChanging.UpdateProgress(400);
 
         var characterMapping = new Dictionary<string, string>()
