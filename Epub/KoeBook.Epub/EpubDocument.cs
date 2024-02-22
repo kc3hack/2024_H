@@ -214,13 +214,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                 await containerStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
-            var coverEntry = archive.CreateEntry($"OEBPS/{Path.GetFileName(CoverFilePath)}");
-            using (var coverStream = coverEntry.Open())
-            using (var coverFileStream = File.OpenRead(CoverFilePath))
-            {
-                await coverFileStream.CopyToAsync(coverStream, ct).ConfigureAwait(false);
-                await coverStream.FlushAsync(ct).ConfigureAwait(false);
-            }
+            archive.CreateEntryFromFile(CoverFilePath, $"OEBPS/{Path.GetFileName(CoverFilePath)}");
 
             var cssEntry = archive.CreateEntry("OEBPS/style.css");
             using (var cssStream = new StreamWriter(cssEntry.Open()))
@@ -272,11 +266,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                         }
                         else if (element is Picture pic && File.Exists(pic.PictureFilePath))
                         {
-                            var pictureEntry = archive.CreateEntry($"OEBPS/{Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}");
-                            using var pictureEntryStream = pictureEntry.Open();
-                            using var pictureFileStream = File.OpenRead(pic.PictureFilePath);
-                            await pictureFileStream.CopyToAsync(pictureEntryStream, ct).ConfigureAwait(false);
-                            await pictureFileStream.FlushAsync(ct).ConfigureAwait(false);
+                            archive.CreateEntryFromFile(pic.PictureFilePath, $"OEBPS/{Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}");
                         }
                     }
                 }
