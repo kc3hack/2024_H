@@ -80,7 +80,8 @@ public sealed class Section(string title)
         var time = TimeSpan.Zero;
         foreach (var element in Elements)
         {
-            if(element is Paragraph para && para.Audio != null) {
+            if (element is Paragraph para && para.Audio != null)
+            {
                 time += para.Audio.TotalTime;
             }
         }

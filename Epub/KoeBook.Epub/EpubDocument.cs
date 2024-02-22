@@ -25,18 +25,18 @@ public class EpubDocument(string title, string author, string coverFIlePath)
     public string CoverFilePath { get; set; } = coverFIlePath;
 
     public List<CssClass> CssClasses { get; set; } = [
-            new CssClass("-epub-media-overlay-active","""
+            new CssClass("-epub-media-overlay-active", """
                 .-epub-media-overlay-active *{
                     background-color: yellow;
                     color: black !important;
                 }
                 """),
-            new CssClass("-epub-media-overlay-unactive","""
+        new CssClass("-epub-media-overlay-unactive", """
                 .-epub-media-overlay-unactive * {
                     color: gray;
                 }
                 """),
-        ];
+    ];
     public List<Chapter> Chapters { get; set; } = [];
 
     public string CreateNavXhtml()
@@ -159,7 +159,7 @@ public class EpubDocument(string title, string author, string coverFIlePath)
                     {
                         builder.AppendLine(@$"        <item id=""audio_{i}_{j}_{k}"" href=""{Chapters[i].Sections[j].Id}_p{k}.mp3"" media-type=""audio/mpeg"" />");
                     }
-                    else if(element is Picture pic && File.Exists(pic.PictureFilePath))
+                    else if (element is Picture pic && File.Exists(pic.PictureFilePath))
                     {
                         builder.AppendLine(@$"        <item id=""img_{i}_{j}_{k}"" href=""{Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}"" media-type=""{EpubCreateHelper.GetImagesMediaType(pic.PictureFilePath)}"" />");
                     }
@@ -197,7 +197,7 @@ public class EpubDocument(string title, string author, string coverFIlePath)
         }
         try
         {
-            using var fs = File.Create(Path.Combine(tmpDirectory, $"{ name ?? Title}.epub"));
+            using var fs = File.Create(Path.Combine(tmpDirectory, $"{name ?? Title}.epub"));
             using var archive = new ZipArchive(fs, ZipArchiveMode.Create);
 
             var mimeTypeEntry = archive.CreateEntry("mimetype", CompressionLevel.NoCompression);
