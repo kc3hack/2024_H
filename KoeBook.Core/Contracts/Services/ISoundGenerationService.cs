@@ -2,7 +2,7 @@
 
 namespace KoeBook.Core.Contracts.Services;
 
-internal interface ISoundGeneration
+public interface ISoundGenerationService
 {
     /// <summary>
     /// 1文の音声を生成します

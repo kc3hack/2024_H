@@ -1,4 +1,6 @@
-﻿namespace KoeBook.Core.Contracts.Services;
+﻿using KoeBook.Core.Models;
+
+namespace KoeBook.Core.Contracts.Services;
 
 public interface ISoundGenerationSelectorService
 {
@@ -9,5 +11,3 @@ public interface ISoundGenerationSelectorService
 
     public ValueTask InitializeAsync(CancellationToken cancellationToken);
 }
-
-public record SoundModel(string name, string[] styles);
