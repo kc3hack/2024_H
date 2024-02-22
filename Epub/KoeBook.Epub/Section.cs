@@ -2,25 +2,19 @@
 
 namespace KoeBook.Epub;
 
-public sealed class Section
+public sealed class Section(string title)
 {
-    public string Id { get; }
-    public string Title { get; set; }
+    public string Id { get; } = Guid.NewGuid().ToString();
+    public string Title { get; set; } = title;
     public List<Element> Elements { get; set; } = [];
 
-    public Section(string title)
-    {
-        Title = title;
-        Id = Guid.NewGuid().ToString();
-    }
-
-    public string CreateSectionXhtml(string? cssPath)
+    public string CreateSectionXhtml()
     {
         var builder = new StringBuilder($"""
             <?xml version="1.0" encoding="UTF-8"?>
             <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
                 <head>  
-                    {(cssPath != null ? $"<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"{cssPath}\"/>" : "")}
+                    <link rel="stylesheet" type="text/css" media="all" href="style.css"/>
                     <title>{Title}</title> 
                 </head> 
                 <body>
@@ -31,15 +25,15 @@ public sealed class Section
             if (Elements[i] is Paragraph para)
             {
                 builder.AppendLine($"""
-                            <p id="{Id}_p{i}" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
+                            <p id="s_{Id}_p{i}" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
                                 {para.Text}
                             </p>
                     """);
             }
-            else if (Elements[i] is Picture pic)
+            else if (Elements[i] is Picture pic && File.Exists(pic.PictureFilePath))
             {
                 builder.AppendLine($"""
-                            <p id="{Id}_p{i}" {(pic.ClassName != null ? $"class=\"{pic.ClassName}\"" : "")}>
+                            <p id="s_{Id}_p{i}" {(pic.ClassName != null ? $"class=\"{pic.ClassName}\"" : "")}>
                                 <img src="{Path.GetFileName(pic.PictureFilePath)}"
                             </p>
                     """);
@@ -53,7 +47,7 @@ public sealed class Section
         return builder.ToString();
     }
 
-    public string CreateSectionSmil(Section section)
+    public string CreateSectionSmil()
     {
         var builder = new StringBuilder($"""
             <?xml version="1.0" encoding="UTF-8"?>
@@ -61,13 +55,13 @@ public sealed class Section
                 <body>
             """);
 
-        for (int i = 0; i < section.Elements.Count; i++)
+        for (int i = 0; i < Elements.Count; i++)
         {
-            if (section.Elements[i] is Paragraph para && para.Audio != null)
+            if (Elements[i] is Paragraph para && para.Audio != null)
             {
                 builder.AppendLine($"""
-                    <par id="{Id}_p{i}_audio" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
-                        <text src="{Id}.xhtml#{Id}_p{i}" />
+                    <par id="s_{Id}_p{i}_audio" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
+                        <text src="{Id}.xhtml#s_{Id}_p{i}" />
                         <audio clipBegin="0s" clipEnd="{para.Audio?.TotalTime}" src="{Id}_p{i}.mp3"/>
                     </par>
             """);
