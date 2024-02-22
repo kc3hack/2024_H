@@ -1,13 +1,11 @@
-# プロダクト名 
-<!-- プロダクト名に変更してください -->
+# KoeBook
 
-![プロダクト名](https://kc3.me/cms/wp-content/uploads/2023/11/2b1b6d9083182c0ce0aeb60000b4d7a7.png)
+![KoeBook](https://kc3.me/cms/wp-content/uploads/2023/11/2b1b6d9083182c0ce0aeb60000b4d7a7.png)
 <!-- プロダクト名・イメージ画像を差し変えてください -->
 
 
 ## チーム名
-チーム○ XXXX
-<!-- チームIDとチーム名を入力してください -->
+チームH OUCC KC3 Hack 出張部
 
 
 ## 背景・課題・解決されること
@@ -16,8 +14,7 @@
 
 
 ## プロダクト説明
-
-<!-- 開発したプロダクトの説明を入力してください -->
+[青空文庫](https://www.aozora.gr.jp/)や[小説家になろう](https://syosetu.com/)にある小説を自動文字起こしするアプリ
 
 
 ## 操作説明・デモ動画
@@ -32,7 +29,10 @@
 
 ## 使用技術
 
-<!-- 使用技術を入力してください -->
+- WinUI 3
+- Chat GPT
+- Style-Bert-VITS2
+- Epub
 
 
 <!--
