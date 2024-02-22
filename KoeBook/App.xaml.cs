@@ -7,9 +7,10 @@ using KoeBook.Helpers;
 using KoeBook.Models;
 using KoeBook.Notifications;
 using KoeBook.Services;
+using KoeBook.Services.CoreMocks;
 using KoeBook.ViewModels;
 using KoeBook.Views;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
@@ -86,6 +87,13 @@ public partial class App : Application
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+
+                // Core Services Mock
+                var mockOptions = context.Configuration.GetValue<MockOptions>(nameof(MockOptions));
+                if (mockOptions.IAnalyzerService.HasValue && mockOptions.IAnalyzerService.Value)
+                    services.AddSingleton<IAnalyzerService, AnalyzerServiceMock>();
+                if (mockOptions.IEpubGenerateService.HasValue && mockOptions.IEpubGenerateService.Value)
+                    services.AddSingleton<IEpubGenerateService, EpubGenerateServiceMock>();
             })
             .Build();
 

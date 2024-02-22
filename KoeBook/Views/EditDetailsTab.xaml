@@ -79,6 +79,22 @@
                                 Text="{x:Bind ViewModel.Task.ProgressText, Mode=OneWay}" />
                         </Grid>
                     </StackPanel>
+
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Margin="{StaticResource MediumTopMargin}"
+                        Text="モデル設定"/>
+
+                    <StackPanel
+                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        Padding="12,8,12,8"
+                        CornerRadius="12"
+                        Margin="{StaticResource SmallTopMargin}">
+                        <TextBlock
+                            Text="キャラクターごとにどのモデルを使用するか設定します。"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollView>
         </Grid>
