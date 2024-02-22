@@ -1,10 +1,13 @@
-﻿namespace KoeBook.Core.Contracts.Services;
+﻿using KoeBook.Core.Models;
+
+namespace KoeBook.Core.Contracts.Services;
 
 public interface ISoundGenerationSelectorService
 {
-    public SoundModel[] Models { get; }
+    /// <summary>
+    /// サウンドモデル・スタイルの一覧
+    /// </summary>
+    public IReadOnlyList<SoundModel> Models { get; }
 
     public ValueTask InitializeAsync(CancellationToken cancellationToken);
 }
-
-public record SoundModel(string name, string[] styles);

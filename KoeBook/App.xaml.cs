@@ -3,7 +3,7 @@ using KoeBook.Components.Dialog;
 using KoeBook.Contracts.Services;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Services;
-using KoeBook.Helpers;
+using KoeBook.Core.Services.Mocks;
 using KoeBook.Models;
 using KoeBook.Notifications;
 using KoeBook.Services;
@@ -94,6 +94,10 @@ public partial class App : Application
                     services.AddSingleton<IAnalyzerService, AnalyzerServiceMock>();
                 if (mockOptions.IEpubGenerateService.HasValue && mockOptions.IEpubGenerateService.Value)
                     services.AddSingleton<IEpubGenerateService, EpubGenerateServiceMock>();
+                if (mockOptions.ISoundGenerationSelectorService.HasValue && mockOptions.ISoundGenerationSelectorService.Value)
+                    services.AddSingleton<ISoundGenerationSelectorService, SoundGenerationSelectorServiceMock>();
+                if (mockOptions.ISoundGenerationService.HasValue && mockOptions.ISoundGenerationService.Value)
+                    services.AddSingleton<ISoundGenerationService, SoundGenerationServiceMock>();
             })
             .Build();
 

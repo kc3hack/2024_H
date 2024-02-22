@@ -23,7 +23,10 @@ public class SecretSettingsService : ISecretSettingsService
         return Task.Run(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var data = await File.ReadAllBytesAsync(Path.Combine(folderPath, "alt"), cancellationToken).ConfigureAwait(false);
+            var path = Path.Combine(folderPath, "alt");
+            if (!File.Exists(path))
+                return null;
+            var data = await File.ReadAllBytesAsync(path, cancellationToken).ConfigureAwait(false);
             if (data is null)
                 return null;
 
