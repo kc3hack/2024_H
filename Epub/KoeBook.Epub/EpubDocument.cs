@@ -273,9 +273,13 @@ public class EpubDocument(string title, string author, string coverFilePath)
             }
             return true;
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
         catch
         {
             return false;
-        }
+        } 
     }
 }
