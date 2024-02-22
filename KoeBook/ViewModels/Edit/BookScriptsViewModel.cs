@@ -50,7 +50,7 @@ public partial class BookScriptsViewModel : ObservableObject
     public void Apply()
     {
         _bookScripts.Options.CharacterMapping = CharacterMapping.ToDictionary(pair => pair.Character, pair => pair.Model);
-        foreach (var line in  ScriptLines)
+        foreach (var line in ScriptLines)
             line.Apply();
     }
 }

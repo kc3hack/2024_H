@@ -49,7 +49,7 @@ public sealed partial class EditDetailsViewModel : ObservableObject, IDisposable
                 Task.BookScripts,
                 Task.Editable,
                 _soundGenerationSelectorService.Models);
-            foreach(var pair in bookScripts.CharacterMapping)
+            foreach (var pair in bookScripts.CharacterMapping)
             {
                 if (!pair.AllowedModels.Contains(pair.Model))
                 {
