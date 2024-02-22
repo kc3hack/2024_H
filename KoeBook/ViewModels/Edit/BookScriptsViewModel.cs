@@ -12,6 +12,11 @@ public partial class BookScriptsViewModel(BookScripts bookScripts, IReadOnlyList
             .Select(kvp => new CharacterModelPairViewModel(kvp.Key, kvp.Value, allowedModels))
             .ToArray();
 
+    public void OnCharacterMapping()
+    {
+        OnPropertyChanged(nameof(CharacterMapping));
+    }
+
     public void Apply()
     {
         _bookScripts.Options.CharacterMapping = CharacterMapping.ToDictionary(pair => pair.Character, pair => pair.Model);

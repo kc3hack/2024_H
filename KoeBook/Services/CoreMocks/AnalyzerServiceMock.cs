@@ -31,9 +31,9 @@ public class AnalyzerServiceMock(IDisplayStateChangeService stateService) : IAna
 
         var characterMapping = new Dictionary<string, string>()
         {
-            ["Hoge"] = "男性1",
-            ["Fuga"] = "女性1",
-            ["Narration"] = "ナレーション (男性)",
+            ["Hoge"] = "青年1",
+            ["Fuga"] = "青年2",
+            ["Narration"] = "ナレーション",
         };
         return new(bookProperties, new(characterMapping))
         {

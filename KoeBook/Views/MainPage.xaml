@@ -13,7 +13,8 @@
         HorizontalScrollMode="Disabled">
         <StackPanel>
             <Grid
-                ColumnSpacing="8">
+                ColumnSpacing="12"
+                RowSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="240" />
@@ -34,7 +35,6 @@
                     BorderThickness="1"
                     Padding="24,16,24,16"
                     CornerRadius="12"
-                    Margin="{StaticResource SmallTopMargin}"
                     HorizontalAlignment="Stretch">
 
                     <!--TODO:EPUB対応
@@ -81,8 +81,7 @@
                     BorderBrush="{ThemeResource CardStrokeColorDefault}"
                     BorderThickness="1"
                     Padding="24,16,24,16"
-                    CornerRadius="12"
-                    Margin="{StaticResource SmallTopMargin}">
+                    CornerRadius="12">
                     <ToggleSwitch
                         IsOn="{x:Bind ViewModel.SkipEdit, Mode=TwoWay}"
                         OffContent="編集する"

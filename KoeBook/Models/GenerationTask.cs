@@ -4,7 +4,7 @@ using KoeBook.Core.Models;
 
 namespace KoeBook.Models;
 
-public partial class GenerationTask(Guid id, string source, SourceType sourceType, bool passEdit) : ObservableObject
+public partial class GenerationTask(Guid id, string source, SourceType sourceType, bool skipEdit) : ObservableObject
 {
     public Guid Id { get; } = id;
 
@@ -48,7 +48,7 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
         get => _skipEdit;
         set
         {
-            if(_skipEdit  != value && SkipEditChangable)
+            if (_skipEdit != value && SkipEditChangable)
             {
                 OnPropertyChanging(nameof(SkipEdit));
                 _skipEdit = value;
@@ -56,7 +56,7 @@ public partial class GenerationTask(Guid id, string source, SourceType sourceTyp
             }
         }
     }
-    private bool _skipEdit = passEdit;
+    private bool _skipEdit = skipEdit;
 
     public bool SkipEditChangable => State < GenerationState.Editting;
 

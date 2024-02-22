@@ -50,10 +50,13 @@ public class GenerationTaskRunnerService
             task.State = GenerationState.Editting;
             task.Progress = 0;
             task.MaximumProgress = 0;
-            var resultPath = await _epubGenService.GenerateEpubAsync(scripts, _tempFolder, task.CancellationToken);
-            task.State = GenerationState.Completed;
-            task.Progress = 0;
-            task.MaximumProgress = 0;
+            if (task.SkipEdit)
+            {
+                var resultPath = await _epubGenService.GenerateEpubAsync(scripts, _tempFolder, task.CancellationToken);
+                task.State = GenerationState.Completed;
+                task.Progress = 0;
+                task.MaximumProgress = 0;
+            }
         }
         catch (OperationCanceledException)
         {

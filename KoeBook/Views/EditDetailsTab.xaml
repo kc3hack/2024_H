@@ -6,10 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:components="using:KoeBook.Components"
+    xmlns:editViewmodel="using:KoeBook.ViewModels.Edit"
     mc:Ignorable="d"
 
-    Header="{x:Bind ViewModel.Task.Title}"
->
+    Header="{x:Bind ViewModel.Task.Title}">
     <TabViewItem.IconSource>
         <SymbolIconSource Symbol="Edit" />
     </TabViewItem.IconSource>
@@ -96,6 +96,9 @@
                         Style="{StaticResource SubtitleTextBlockStyle}"
                         Margin="{StaticResource MediumTopMargin}"
                         Text="モデル設定"/>
+                    <TextBlock
+                        Margin="{StaticResource XXSmallTopMargin}"
+                        Text="キャラクターごとにどのモデルを使用するか設定します。"/>
 
                     <StackPanel
                         Background="{ThemeResource CardBackgroundFillColorDefault}"
@@ -104,8 +107,33 @@
                         Padding="12,8,12,8"
                         CornerRadius="12"
                         Margin="{StaticResource SmallTopMargin}">
-                        <TextBlock
-                            Text="キャラクターごとにどのモデルを使用するか設定します。"/>
+                        <ItemsRepeater
+                            ItemsSource="{x:Bind ViewModel.BookScripts.CharacterMapping, Mode=OneWay}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Orientation="Vertical" Spacing="2" />
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="editViewmodel:CharacterModelPairViewModel">
+                                    <ItemContainer>
+                                        <Grid
+                                            Padding="10,5,10,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="360" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="{x:Bind Character}"
+                                                VerticalAlignment="Center"/>
+                                            <ComboBox
+                                                Grid.Column="1"
+                                                Width="360"
+                                                ItemsSource="{x:Bind AllowedModels}"
+                                                SelectedItem="{x:Bind Model, Mode=TwoWay}"/>
+                                        </Grid>
+                                    </ItemContainer>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
                     </StackPanel>
                 </StackPanel>
             </ScrollView>
