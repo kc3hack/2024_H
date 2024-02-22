@@ -14,7 +14,7 @@ public class EpubDocumentStoreService : IEpubDocumentStoreService
         lock (_documents)
         {
             var id = document.Id;
-            if(_documents.Any(e => e.Id == id))
+            if (_documents.Any(e => e.Id == id))
                 throw new ArgumentException($"The key {id} is already registered in {nameof(EpubDocumentStoreService)}");
             _documents.Add(document);
         }
@@ -25,8 +25,8 @@ public class EpubDocumentStoreService : IEpubDocumentStoreService
         EpubDocument? document;
         lock (_documents)
         {
-            document = _documents.Where(doc=> doc.Id == id).FirstOrDefault();
-            if(document == null)
+            document = _documents.Where(doc => doc.Id == id).FirstOrDefault();
+            if (document == null)
                 throw new ArgumentException($"The key {id} is already unregistered in {nameof(EpubDocumentStoreService)}");
             _documents.Remove(document);
         }
