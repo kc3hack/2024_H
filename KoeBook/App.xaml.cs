@@ -91,7 +91,7 @@ public partial class App : Application
                 var mockOptions = context.Configuration.GetSection(nameof(MockOptions)).Get<MockOptions>();
                 if (mockOptions.ISoundGenerationSelectorService.HasValue && mockOptions.ISoundGenerationSelectorService.Value)
                     services.AddSingleton<ISoundGenerationSelectorService, SoundGenerationSelectorServiceMock>();
-                if(mockOptions.ISoundGenerationService.HasValue && mockOptions.ISoundGenerationService.Value)
+                if (mockOptions.ISoundGenerationService.HasValue && mockOptions.ISoundGenerationService.Value)
                     services.AddSingleton<ISoundGenerationService, SoundGenerationServiceMock>();
             })
             .Build();
