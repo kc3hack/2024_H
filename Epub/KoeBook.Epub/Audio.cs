@@ -19,11 +19,8 @@ public sealed class Audio
         TotalTime = reader.TotalTime;
     }
 
-    public async Task<MemoryStream> GetStreamAsync(CancellationToken ct)
+    public MemoryStream GetStream()
     {
-        var ms = new MemoryStream();
-        await ms.WriteAsync(_mp3Data, ct);
-        ms.Position = 0;
-        return ms;
+        return new MemoryStream(_mp3Data);
     }
 }

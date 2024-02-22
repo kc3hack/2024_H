@@ -265,7 +265,7 @@ public class EpubDocument(string title, string author, string coverFIlePath)
                         if (element is Paragraph para && para.Audio != null)
                         {
                             var audioEntry = archive.CreateEntry($"OEBPS/{Chapters[i].Sections[j].Id}_p{k}.mp3");
-                            using var audioStream = await para.Audio.GetStreamAsync(ct).ConfigureAwait(false);
+                            using var audioStream = para.Audio.GetStream();
                             using var audioEntryStream = audioEntry.Open();
                             await audioStream.CopyToAsync(audioEntryStream, ct).ConfigureAwait(false);
                             await audioEntryStream.FlushAsync(ct).ConfigureAwait(false);
