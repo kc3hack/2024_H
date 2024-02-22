@@ -36,6 +36,7 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
 
         if (await document.TryCreateEpubAsync(tempDirectory, bookScripts.BookProperties.Id.ToString(), cancellationToken))
         {
+            _documentStoreService.Unregister(bookScripts.BookProperties.Id);
             return Path.Combine(tempDirectory, $"{bookScripts.BookProperties.Id}.epub");
         }
         else

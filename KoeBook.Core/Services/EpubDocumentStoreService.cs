@@ -9,7 +9,7 @@ public class EpubDocumentStoreService : IEpubDocumentStoreService
     private readonly List<EpubDocument> _documents = [];
     public IReadOnlyList<EpubDocument> Documents => _documents;
 
-    public void Register(EpubDocument document)
+    public void Register(EpubDocument document, CancellationToken cancellationToken)
     {
         lock (_documents)
         {
@@ -18,6 +18,7 @@ public class EpubDocumentStoreService : IEpubDocumentStoreService
                 throw new ArgumentException($"The key {id} is already registered in {nameof(EpubDocumentStoreService)}");
             _documents.Add(document);
         }
+        cancellationToken.Register(() => Unregister(document.Id));
     }
 
     public void Unregister(Guid id)
