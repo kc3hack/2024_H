@@ -189,7 +189,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
         return builder.ToString();
     }
 
-    public async Task<bool> TryCreateEpubAsync(string tmpDirectory, string? name, CancellationToken ct)
+    public async Task<bool> TryCreateEpubAsync(string tmpDirectory, string name, CancellationToken ct)
     {
         if (!File.Exists(CoverFilePath))
         {
@@ -197,7 +197,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
         }
         try
         {
-            using var fs = File.Create(Path.Combine(tmpDirectory, $"{name ?? Title}.epub"));
+            using var fs = File.Create(Path.Combine(tmpDirectory, $"{name}.epub"));
             using var archive = new ZipArchive(fs, ZipArchiveMode.Create);
 
             var mimeTypeEntry = archive.CreateEntry("mimetype", CompressionLevel.NoCompression);
