@@ -53,7 +53,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                         <ol>
 
             """);
-        if (Chapters?.Count == 1 && Chapters[0].Title == null)
+        if (Chapters.Count == 1 && Chapters[0].Title == null)
         {
             for (int i = 0; i < Chapters[0].Sections.Count; i++)
             {
@@ -66,7 +66,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
         }
         else
         {
-            for (int i = 0; i < Chapters?.Count; i++)
+            for (int i = 0; i < Chapters.Count; i++)
             {
                 builder.AppendLine($"""
                                     <li>
@@ -124,7 +124,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
             """);
 
         var totalTime = TimeSpan.Zero;
-        for (int i = 0; i < Chapters?.Count; i++)
+        for (int i = 0; i < Chapters.Count; i++)
         {
             for (int j = 0; j < Chapters[i].Sections.Count; j++)
             {
@@ -144,7 +144,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                     <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
             """);
 
-        for (int i = 0; i < Chapters?.Count; i++)
+        for (int i = 0; i < Chapters.Count; i++)
         {
             for (int j = 0; j < Chapters[i].Sections.Count; j++)
             {
@@ -172,7 +172,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                 <spine page-progression-direction="ltr">
             """);
 
-        for (int i = 0; i < Chapters?.Count; i++)
+        for (int i = 0; i < Chapters.Count; i++)
         {
             for (int j = 0; j < Chapters[i].Sections.Count; j++)
             {
@@ -237,7 +237,7 @@ public class EpubDocument(string title, string author, string coverFilePath)
                 await opfStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
-            for (int i = 0; i < Chapters?.Count; i++)
+            for (int i = 0; i < Chapters.Count; i++)
             {
                 for (int j = 0; j < Chapters[i].Sections.Count; j++)
                 {
