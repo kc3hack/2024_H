@@ -280,6 +280,6 @@ public class EpubDocument(string title, string author, string coverFilePath)
         catch
         {
             return false;
-        } 
+        }
     }
 }
