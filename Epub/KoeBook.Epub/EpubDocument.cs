@@ -8,7 +8,7 @@ using NAudio.Mixer;
 
 namespace KoeBook.Epub;
 
-public class EpubDocument(string title, string author, string coverFIlePath)
+public class EpubDocument(string title, string author, string coverFilePath)
 {
     readonly string _containerXml = """
      <?xml version="1.0" encoding="UTF-8"?>
@@ -22,7 +22,7 @@ public class EpubDocument(string title, string author, string coverFIlePath)
     public string Title { get; set; } = title;
     public string Author { get; set; } = author;
 
-    public string CoverFilePath { get; set; } = coverFIlePath;
+    public string CoverFilePath { get; set; } = coverFilePath;
 
     public List<CssClass> CssClasses { get; set; } = [
             new CssClass("-epub-media-overlay-active", """
