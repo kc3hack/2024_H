@@ -81,6 +81,7 @@ public partial class App : Application
                 services.AddTransient<SettingsPage>();
                 services.AddTransient<MainViewModel>();
                 services.AddTransient<TaskListViewModel>();
+                services.AddTransient<GenerationTaskViewModel>();
                 services.AddTransient<MainPage>();
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();

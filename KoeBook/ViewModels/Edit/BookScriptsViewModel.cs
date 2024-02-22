@@ -25,7 +25,7 @@ public partial class BookScriptsViewModel : ObservableObject
         ScriptLines = bookScripts.ScriptLines.Select(line =>
         {
             var model = characterMapping[line.Character];
-            return new ScriptLineViewModel(line, allowedModels.First(m => m.Name == model).Styles);
+            return new ScriptLineViewModel(line, editable, allowedModels.First(m => m.Name == model).Styles);
         }).ToArray();
 
         foreach (var pair in CharacterMapping)

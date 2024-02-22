@@ -17,10 +17,14 @@ public partial class ScriptLineViewModel : ObservableObject
     [ObservableProperty]
     private IReadOnlyList<string> _allowedStyles = [];
 
-    public ScriptLineViewModel(ScriptLine scriptLine, IReadOnlyList<string> allowedStyles)
+    [ObservableProperty]
+    private bool _editable;
+
+    public ScriptLineViewModel(ScriptLine scriptLine, bool editable, IReadOnlyList<string> allowedStyles)
     {
         _scriptLine = scriptLine;
         _style = scriptLine.Style;
+        _editable = editable;
         AllowedStyles = allowedStyles;
     }
 

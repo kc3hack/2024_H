@@ -22,7 +22,12 @@ public sealed partial class TaskListViewModel : ObservableObject
     public TaskListViewModel(IGenerationTaskService taskService, ITabViewService tabViewService, GenerationTaskRunnerService runnerService)
     {
         GenerationTasks = new(taskService.Tasks
-            .Select(t => new GenerationTaskViewModel(t, tabViewService, runnerService)));
+            .Select(t =>
+            {
+                var viewModel = App.GetService<GenerationTaskViewModel>();
+                viewModel.Task = t;
+                return viewModel;
+            }));
         GenerationTasks.CollectionChanged += TaskCollectionChanged;
         taskService.OnTasksChanged += OnTasksChanged;
         _tabViewService = tabViewService;
@@ -34,12 +39,16 @@ public sealed partial class TaskListViewModel : ObservableObject
         switch (action)
         {
             case ChangedEvents.Registered:
-                GenerationTasks.Insert(0, new(task, _tabViewService, _generationTaskRunnerService));
+                {
+                    var viewModel = App.GetService<GenerationTaskViewModel>();
+                    viewModel.Task = task;
+                    GenerationTasks.Insert(0, viewModel);
+                }
                 break;
             case ChangedEvents.Unregistered:
                 {
                     var id = task.Id;
-                    var taskViewModel = GenerationTasks.FirstOrDefault(tvm => tvm.Task.Id == id);
+                    var taskViewModel = GenerationTasks.FirstOrDefault(tvm => tvm.Task?.Id == id);
                     if (taskViewModel is not null)
                         GenerationTasks.Remove(taskViewModel);
                     break;

@@ -95,7 +95,7 @@
                             Margin="{StaticResource SmallTopMargin}"
                             Command="{x:Bind ViewModel.StartGenerationAsyncCommand}"
                             IsEnabled="{x:Bind ViewModel.Task.Editable, Mode=OneWay}"
-                            Style="{ThemeResource ButtonRevealStyle}"
+                            Style="{ThemeResource AccentButtonStyle}"
                             Content="生成開始"/>
                         <TextBlock
                             Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
@@ -197,6 +197,7 @@
                                             <ComboBox
                                                 Grid.Column="1"
                                                 Width="160"
+                                                IsEnabled="{x:Bind Editable, Mode=OneWay}"
                                                 SelectedItem="{x:Bind Style, Mode=TwoWay}"
                                                 ItemsSource="{x:Bind AllowedStyles, Mode=OneWay}" />
                                             <TextBlock
