@@ -3,13 +3,13 @@ using KoeBook.Components.Dialog;
 using KoeBook.Contracts.Services;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Services;
-using KoeBook.Helpers;
+using KoeBook.Core.Services.Mocks;
 using KoeBook.Models;
 using KoeBook.Notifications;
 using KoeBook.Services;
 using KoeBook.ViewModels;
 using KoeBook.Views;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
@@ -86,6 +86,13 @@ public partial class App : Application
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+
+                // Core Services Mock
+                var mockOptions = context.Configuration.GetSection(nameof(MockOptions)).Get<MockOptions>();
+                if (mockOptions.ISoundGenerationSelectorService.HasValue && mockOptions.ISoundGenerationSelectorService.Value)
+                    services.AddSingleton<ISoundGenerationSelectorService, SoundGenerationSelectorServiceMock>();
+                if (mockOptions.ISoundGenerationService.HasValue && mockOptions.ISoundGenerationService.Value)
+                    services.AddSingleton<ISoundGenerationService, SoundGenerationServiceMock>();
             })
             .Build();
 
