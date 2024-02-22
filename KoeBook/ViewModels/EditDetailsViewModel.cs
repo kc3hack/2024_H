@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using KoeBook.Core.Contracts.Services;
 using KoeBook.Models;
 using Microsoft.UI.Xaml;
 

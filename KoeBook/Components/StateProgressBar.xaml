@@ -63,6 +63,10 @@
                 <TextBlock
                     Width="80"
                     TextAlignment="Center"
+                    Text="編集中" />
+                <TextBlock
+                    Width="80"
+                    TextAlignment="Center"
                     Text="音声生成中" />
                 <TextBlock
                     Width="80"

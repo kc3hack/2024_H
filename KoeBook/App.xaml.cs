@@ -65,6 +65,7 @@ public partial class App : Application
                 services.AddSingleton<ITabViewService, TabViewService>();
 
                 services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
+                services.AddSingleton<GenerationTaskRunnerService>();
                 services.AddSingleton<IActivationService, ActivationService>();
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
@@ -89,7 +90,7 @@ public partial class App : Application
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
 
                 // Core Services Mock
-                var mockOptions = context.Configuration.GetValue<MockOptions>(nameof(MockOptions));
+                var mockOptions = context.Configuration.GetSection(nameof(MockOptions)).Get<MockOptions>()!;
                 if (mockOptions.IAnalyzerService.HasValue && mockOptions.IAnalyzerService.Value)
                     services.AddSingleton<IAnalyzerService, AnalyzerServiceMock>();
                 if (mockOptions.IEpubGenerateService.HasValue && mockOptions.IEpubGenerateService.Value)

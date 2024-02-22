@@ -11,5 +11,5 @@ public class BookOptions(Dictionary<string, string> characterMapping)
     /// <summary>
     /// キャラクターとモデルの紐づけ。Key: キャラクター, Value: モデル
     /// </summary>
-    public Dictionary<string, string> CharacterMapping { get; } = characterMapping;
+    public Dictionary<string, string> CharacterMapping { get; set; } = characterMapping;
 }

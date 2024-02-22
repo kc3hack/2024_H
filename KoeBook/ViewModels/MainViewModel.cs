@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using KoeBook.Contracts.Services;
 using KoeBook.Core.Models;
+using KoeBook.Services;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -27,7 +28,10 @@ public sealed partial class MainViewModel : ObservableRecipient
 
     private bool CanExecuteStartProcess => EbookFilePath is not null || !string.IsNullOrEmpty(EbookUrl);
 
-    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService)
+    [ObservableProperty]
+    private bool _skipEdit = true;
+
+    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService, GenerationTaskRunnerService _)
     {
         _taskService = taskService;
         _dialogService = dialogService;
@@ -86,7 +90,10 @@ public sealed partial class MainViewModel : ObservableRecipient
         }
 
         var source = EbookFilePath ?? EbookUrl!;
-        _taskService.Register(new(Guid.NewGuid(), source, EbookFilePath is null ? SourceType.Url : SourceType.FilePath));
+        _taskService.Register(new(Guid.NewGuid(),
+            source,
+            EbookFilePath is null ? SourceType.Url : SourceType.FilePath,
+            SkipEdit));
         EbookFilePath = null;
         EbookUrl = null;
     }

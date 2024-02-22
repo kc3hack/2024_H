@@ -9,13 +9,13 @@ public class GenerationTaskService : IGenerationTaskService
     private readonly List<GenerationTask> _tasks =
 #if DEBUG
         [
-            new(Guid.NewGuid(), "book.epub", SourceType.FilePath)
+            new(Guid.NewGuid(), "book.epub", SourceType.FilePath, false)
             {
                 Progress = 30,
                 MaximumProgress = 100,
                 State = GenerationState.Analyzing,
             },
-            new(Guid.NewGuid(), "https://example.com", SourceType.Url)
+            new(Guid.NewGuid(), "https://example.com", SourceType.Url, false)
             {
                 Progress = 0,
                 MaximumProgress = 0,
@@ -69,5 +69,6 @@ public class GenerationTaskService : IGenerationTaskService
         }
 
         OnTasksChanged?.Invoke(task, ChangedEvents.Unregistered);
+        task.CancellationTokenSource.Cancel();
     }
 }

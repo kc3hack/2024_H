@@ -55,6 +55,18 @@
                         <TextBlock
                             Style="{StaticResource BodyStrongTextBlockStyle}"
                             Margin="{StaticResource XSmallTopMargin}"
+                            Text="編集スキップ"
+                            ToolTipService.ToolTip="キャラクターなどの編集を行わずにそのまま実行します"/>
+                        <ToggleSwitch
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            OffContent="編集する"
+                            OnContent="編集しない"
+                            IsEnabled="{x:Bind ViewModel.Task.SkipEditChangable, Mode=OneWay}"
+                            IsOn="{x:Bind ViewModel.Task.SkipEdit, Mode=TwoWay}"/>
+
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Margin="{StaticResource XSmallTopMargin}"
                             Text="実行状況"
                             ToolTipService.ToolTip=""/>
                         <components:StateProgressBar
