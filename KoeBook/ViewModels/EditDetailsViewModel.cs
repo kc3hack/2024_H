@@ -23,6 +23,8 @@ public sealed partial class EditDetailsViewModel : ObservableObject, IDisposable
 
     public Visibility AnalyzingTextVisibility => BookScripts is null ? Visibility.Visible : Visibility.Collapsed;
 
+    private bool _disposed;
+
     public EditDetailsViewModel(ISoundGenerationSelectorService soundGenerationSelectorService, GenerationTaskRunnerService generationTaskRunnerService)
     {
         _soundGenerationSelectorService = soundGenerationSelectorService;
@@ -82,6 +84,10 @@ public sealed partial class EditDetailsViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        Task.PropertyChanged -= Task_PropertyChanged;
+        if (!_disposed)
+        {
+            Task.PropertyChanged -= Task_PropertyChanged;
+            _disposed = true;
+        }
     }
 }

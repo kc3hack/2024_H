@@ -132,6 +132,10 @@ public sealed class TabViewService : ITabViewService, IDisposable
 
     public void Dispose()
     {
-        _taskService.OnTasksChanged -= OnTasksChanged;
+        if (!_disposed)
+        {
+            _taskService.OnTasksChanged -= OnTasksChanged;
+            _disposed = true;
+        }
     }
 }
