@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using KoeBook.Contracts.Services;
 using KoeBook.Core.Models;
+using KoeBook.Services;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -11,8 +12,8 @@ namespace KoeBook.ViewModels;
 public sealed partial class MainViewModel : ObservableRecipient
 {
     private readonly IGenerationTaskService _taskService;
-
     private readonly IDialogService _dialogService;
+    private readonly ILocalSettingsService _localSettingsService;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EbookFileName))]
@@ -27,10 +28,23 @@ public sealed partial class MainViewModel : ObservableRecipient
 
     private bool CanExecuteStartProcess => EbookFilePath is not null || !string.IsNullOrEmpty(EbookUrl);
 
-    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService)
+    [ObservableProperty]
+    private bool _skipEdit = true;
+
+    const string SkipEditSettingsKey = "SkipEdit";
+
+    public MainViewModel(IGenerationTaskService taskService, IDialogService dialogService, ILocalSettingsService localSettingsService, GenerationTaskRunnerService _)
     {
         _taskService = taskService;
         _dialogService = dialogService;
+        _localSettingsService = localSettingsService;
+
+        InitializeAsync(); // 必ず最後に実行すること
+    }
+
+    private async void InitializeAsync()
+    {
+        SkipEdit = await _localSettingsService.ReadSettingAsync<bool?>(SkipEditSettingsKey) ?? true;
     }
 
     [RelayCommand]
@@ -86,7 +100,10 @@ public sealed partial class MainViewModel : ObservableRecipient
         }
 
         var source = EbookFilePath ?? EbookUrl!;
-        _taskService.Register(new(Guid.NewGuid(), source, EbookFilePath is null ? SourceType.Url : SourceType.FilePath));
+        _taskService.Register(new(Guid.NewGuid(),
+            source,
+            EbookFilePath is null ? SourceType.Url : SourceType.FilePath,
+            SkipEdit));
         EbookFilePath = null;
         EbookUrl = null;
     }
@@ -105,6 +122,16 @@ public sealed partial class MainViewModel : ObservableRecipient
         {
             args.Cancel = true;
             EbookUrl = string.Empty;
+        }
+    }
+
+    partial void OnSkipEditChanged(bool value)
+    {
+        CoreAsync(_localSettingsService, value);
+
+        static async void CoreAsync(ILocalSettingsService settingsService, bool skipEdit)
+        {
+            await settingsService.SaveSettingAsync(SkipEditSettingsKey, skipEdit);
         }
     }
 }

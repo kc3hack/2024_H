@@ -1,5 +1,6 @@
 ﻿using KoeBook.Activation;
 using KoeBook.Contracts.Services;
+using KoeBook.Core.Contracts.Services;
 using KoeBook.Views;
 
 using Microsoft.UI.Xaml;
@@ -12,13 +13,19 @@ public class ActivationService : IActivationService
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
+    private readonly ISoundGenerationSelectorService _soundGenerationSelectorService;
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService)
+    public ActivationService(
+        ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+        IEnumerable<IActivationHandler> activationHandlers,
+        IThemeSelectorService themeSelectorService,
+        ISoundGenerationSelectorService soundGenerationSelectorService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
+        _soundGenerationSelectorService = soundGenerationSelectorService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -61,6 +68,7 @@ public class ActivationService : IActivationService
     private async Task InitializeAsync()
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+        await _soundGenerationSelectorService.InitializeAsync(default).ConfigureAwait(false);
         await Task.CompletedTask;
     }
 

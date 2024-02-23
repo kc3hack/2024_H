@@ -7,6 +7,7 @@ using KoeBook.Core.Services.Mocks;
 using KoeBook.Models;
 using KoeBook.Notifications;
 using KoeBook.Services;
+using KoeBook.Services.CoreMocks;
 using KoeBook.ViewModels;
 using KoeBook.Views;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +65,7 @@ public partial class App : Application
                 services.AddSingleton<ITabViewService, TabViewService>();
 
                 services.AddSingleton<IGenerationTaskService, GenerationTaskService>();
+                services.AddSingleton<GenerationTaskRunnerService>();
                 services.AddSingleton<IActivationService, ActivationService>();
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
@@ -79,6 +81,7 @@ public partial class App : Application
                 services.AddTransient<SettingsPage>();
                 services.AddTransient<MainViewModel>();
                 services.AddTransient<TaskListViewModel>();
+                services.AddTransient<GenerationTaskViewModel>();
                 services.AddTransient<MainPage>();
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();
@@ -88,7 +91,11 @@ public partial class App : Application
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
 
                 // Core Services Mock
-                var mockOptions = context.Configuration.GetSection(nameof(MockOptions)).Get<MockOptions>();
+                var mockOptions = context.Configuration.GetSection(nameof(MockOptions)).Get<MockOptions>()!;
+                if (mockOptions.IAnalyzerService.HasValue && mockOptions.IAnalyzerService.Value)
+                    services.AddSingleton<IAnalyzerService, AnalyzerServiceMock>();
+                if (mockOptions.IEpubGenerateService.HasValue && mockOptions.IEpubGenerateService.Value)
+                    services.AddSingleton<IEpubGenerateService, EpubGenerateServiceMock>();
                 if (mockOptions.ISoundGenerationSelectorService.HasValue && mockOptions.ISoundGenerationSelectorService.Value)
                     services.AddSingleton<ISoundGenerationSelectorService, SoundGenerationSelectorServiceMock>();
                 if (mockOptions.ISoundGenerationService.HasValue && mockOptions.ISoundGenerationService.Value)

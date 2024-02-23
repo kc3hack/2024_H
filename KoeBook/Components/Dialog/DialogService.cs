@@ -1,12 +1,16 @@
 ﻿using KoeBook.Contracts.Services;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace KoeBook.Components.Dialog;
 
 public class DialogService : IDialogService
 {
-    private static Style? DefaultDialogStyle => Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+    private readonly IThemeSelectorService _themeSelectorService;
+
+    public DialogService(IThemeSelectorService themeSelectorService)
+    {
+        _themeSelectorService = themeSelectorService;
+    }
 
     public Task<ContentDialogResult> ShowAsync(
         string title,
@@ -18,15 +22,11 @@ public class DialogService : IDialogService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var contentDialog = new ContentDialog()
+        var contentDialog = new SharedContentDialog(title, primaryText, closeText, defaultButton)
         {
             XamlRoot = App.MainWindow.Content.XamlRoot,
-            Title = title,
             Content = content,
-            Style = DefaultDialogStyle,
-            PrimaryButtonText = primaryText,
-            CloseButtonText = closeText,
-            DefaultButton = defaultButton,
+            RequestedTheme = _themeSelectorService.Theme
         };
 
         return contentDialog.ShowAsync().AsTask(cancellationToken);

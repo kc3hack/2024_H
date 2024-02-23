@@ -14,6 +14,9 @@ public enum GenerationState
     [EnumMember(Value = "解析中")]
     Analyzing,
 
+    [EnumMember(Value = "編集中")]
+    Editting,
+
     [EnumMember(Value = "音声生成中")]
     SoundProducing,
 

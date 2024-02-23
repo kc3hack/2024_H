@@ -13,7 +13,7 @@ internal class SoundGenerationSelectorServiceMock : ISoundGenerationSelectorServ
         Models = [
             new SoundModel("青年1", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
             new SoundModel("青年2", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
-            new SoundModel("王", ["narration", "neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
+            new SoundModel("ナレーション", ["narration"]),
         ];
     }
 }
