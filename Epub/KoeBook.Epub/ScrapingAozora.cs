@@ -2,13 +2,14 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
+using KoeBook.Epub.Service;
 using System.IO;
 using static KoeBook.Epub.ScrapingHelper;
 
 
 namespace KoeBook.Epub
 {
-    public partial class ScrapingAozora
+    public partial class ScrapingAozora: IScrapingService
     {
         private int chapterNum;
         private int sectionNum;
@@ -37,7 +38,7 @@ namespace KoeBook.Epub
             }
 
             // EpubDocument の生成
-            var document = new EpubDocument(TextReplace(bookTitle.InnerHtml), TextReplace(bookAuther.InnerHtml), coverFilePath)
+            var document = new EpubDocument(TextReplace(bookTitle.InnerHtml), TextReplace(bookAuther.InnerHtml), coverFilePath, id)
             {
                 // EpubDocument.Chapters の生成
                 Chapters = new List<Chapter>()
