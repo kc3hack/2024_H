@@ -16,6 +16,7 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IApiRootSelectorService _apiRootSelectorService;
+    private readonly ISecretSettingsService _secretSettingsService;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ISoundGenerationSelectorService _soundGenerationSelectorService;
 
@@ -30,7 +31,7 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     [ObservableProperty]
-    private string _apiKey = string.Empty;
+    private string _apiKey;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ApiKeyRevealMode))]
@@ -50,11 +51,13 @@ public partial class SettingsViewModel : ObservableRecipient
     public SettingsViewModel(IThemeSelectorService themeSelectorService,
         IApiRootSelectorService apiRootSelectorService,
         ISoundGenerationSelectorService soundGenerationSelectorService,
-        ILocalSettingsService localSettingsService)
+        ILocalSettingsService localSettingsService,
+        ISecretSettingsService secretSettingsService)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
-        _localSettingsService = localSettingsService;
+        _secretSettingsService = secretSettingsService;
+        _apiKey = _secretSettingsService.ApiKey ?? string.Empty;
         _apiRootSelectorService = apiRootSelectorService;
         _styleBertVitsRoot = apiRootSelectorService.StyleBertVitsRoot;
         _soundGenerationSelectorService = soundGenerationSelectorService;
@@ -85,13 +88,6 @@ public partial class SettingsViewModel : ObservableRecipient
             await service.SetStyleBertVitsRoot(root);
             await soundService.InitializeAsync(default);
         }
-    }
-
-    public async void OnLoaded(object _, RoutedEventArgs __)
-    {
-        var key = await _localSettingsService.GetApiKeyAsync(default);
-        if (key is not null)
-            ApiKey = key;
     }
 
     private static string GetVersionDescription()

@@ -2,7 +2,9 @@
 
 public interface ISecretSettingsService
 {
-    Task<string?> GetApiKeyAsync(string folderPath, CancellationToken cancellationToken);
+    string? ApiKey { get; }
+
+    Task<string?> InitializeAsync(string folderPath, CancellationToken cancellationToken);
 
     Task SaveApiKeyAsync(string folderPath, string apiKey, CancellationToken cancellationToken);
 }

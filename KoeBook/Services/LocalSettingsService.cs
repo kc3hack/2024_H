@@ -87,7 +87,7 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async ValueTask<string?> GetApiKeyAsync(CancellationToken cancellationToken)
     {
-        return await _secretSettingsService.GetApiKeyAsync(_applicationDataFolder, cancellationToken).ConfigureAwait(false);
+        return await _secretSettingsService.InitializeAsync(_applicationDataFolder, cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask SaveApiKeyAsync(string apiKey, CancellationToken cancellationToken)
