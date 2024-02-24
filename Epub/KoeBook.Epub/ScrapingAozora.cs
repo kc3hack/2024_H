@@ -9,7 +9,7 @@ using static KoeBook.Epub.ScrapingHelper;
 
 namespace KoeBook.Epub
 {
-    public partial class ScrapingAozora: IScrapingService
+    public partial class ScrapingAozora : IScrapingService
     {
         private int chapterNum;
         private int sectionNum;
