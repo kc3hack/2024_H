@@ -35,7 +35,7 @@ public partial class ChaGptAnalyzerService(IOpenAIService openAIService) : ILlmA
         }
 
         // キャラクター名と声のマッピング
-        var characterVoiceMapping = await GetCharacterVoiceMappingAsync(characterList.Peek(), cancellationToken);
+        var characterVoiceMapping = await GetCharacterVoiceMappingAsync(scriptLines, characterList.Peek(), cancellationToken);
 
         var bookScripts = new BookScripts
         (
@@ -161,10 +161,11 @@ public partial class ChaGptAnalyzerService(IOpenAIService openAIService) : ILlmA
             var result = completionResult.Choices.First().Message.Content;
             // "#### Talker and Style Setting"以下の文章を改行区切りでリスト化
             List<string> output = new List<string>();
-            var lines = result.Split("\n");
+            var lines = result?.Split("\n");
             var start = false;
-            foreach (var line in lines)
+            for (var i = 0; i < lines?.Length; i++)
             {
+                var line = lines[i];
                 if (start)
                 {
                     if (line.Contains("```"))
@@ -263,20 +264,23 @@ public partial class ChaGptAnalyzerService(IOpenAIService openAIService) : ILlmA
                     - {summary2}
                     ...
                     ```
-                    """)
+                    """),
             },
+            Model = OpenAI.ObjectModels.Models.Gpt_4_0125_preview,
+            MaxTokens = 2000
         });
         if (completionResult.Successful)
         {
             var result = completionResult.Choices.First().Message.Content;
-            var lines = result.Split("\n");
+            var lines = result?.Split("\n");
             bool summaryStart = false;
             bool characterListStart = false;
             StringBuilder _summary = new();
             StringBuilder _characterList = new();
 
-            foreach (var line in lines)
+            for (var i = 0; i < lines?.Length; i++)
             {
+                var line = lines[i];
                 if (line.Contains("#### CharacterList"))
                 {
                     characterListStart = true;
@@ -311,20 +315,82 @@ public partial class ChaGptAnalyzerService(IOpenAIService openAIService) : ILlmA
         }
     }
 
-    private async Task<Dictionary<string, string>> GetCharacterVoiceMappingAsync(string characterList, CancellationToken cancellationToken)
+    private async Task<Dictionary<string, string>> GetCharacterVoiceMappingAsync(List<ScriptLine> scriptLines, string characterDescription, CancellationToken cancellationToken)
     {
-        //var completionResult = await _openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
-        //{
-        //    Messages = new List<ChatMessage>
-        //    {
-        //        ChatMessage.FromSystem($$"""
-        //        All Information
-        //            - Goal
-        //            - Information about this story
-        //            - Output Format
-        //        """)
-        //    }
-        //}
-        return new Dictionary<string, string>();
+        // キャラクター名一覧の取得
+        var characterList = scriptLines.Select(x => "- " + x.Character).Distinct().ToList();
+        var characterListString = string.Join("\n", characterList);
+        var completionResult = await _openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
+        {
+            Messages = new List<ChatMessage>
+            {
+                ChatMessage.FromSystem($$"""
+                All Information
+                    - Goal
+                    - Character Description
+                    - Character List
+                    - Voice List
+                    - Output Format
+
+                #### Goal
+                Make a table of character names and voices
+
+                #### Character Description
+                {{characterDescription}}
+
+                #### Character List
+                {{characterListString}}
+
+                #### Voice List
+                - ナレーション女
+                - 女子小学生
+                - 女子中高生
+                - 成人女性
+                - 老年女性
+                - ナレーション男
+                - 男子小学生
+                - 男子中高生
+                - 成人男性
+                - 老年男性
+
+                #### Output Format
+                ```
+                {character1} - {voice1}
+                {character2} - {voice2}
+                ...
+                ```
+                """)
+            },
+            Model = OpenAI.ObjectModels.Models.Gpt_4_0125_preview,
+            MaxTokens = 2000
+        });
+        if (completionResult.Successful)
+        {
+            var result = completionResult.Choices.First().Message.Content;
+            var lines = result?.Split("\n");
+            Dictionary<string, string> characterVoiceMapping = new();
+            foreach (var match in from line in lines
+                                  let match = CharacterMappingRegex().Match(line)
+                                  select match)
+            {
+                if (match.Success)
+                {
+                    characterVoiceMapping.Add(match.Groups[1].Value, match.Groups[2].Value);
+                }
+                else
+                {
+                    EbookException.Throw(ExceptionType.Gpt4TalkerAndStyleSettingFailed);
+                }
+            }
+            return characterVoiceMapping;
+        }
+        else
+        {
+            EbookException.Throw(ExceptionType.Gpt4TalkerAndStyleSettingFailed);
+            return default!;
+        }
     }
+
+    [GeneratedRegex(@"(.+) - (.+)")]
+    private static partial Regex CharacterMappingRegex();
 }

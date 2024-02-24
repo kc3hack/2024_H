@@ -7,7 +7,7 @@ using KoeBook.Epub.Service;
 
 namespace KoeBook.Core.Services;
 
-public class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStoreService epubDocumentStoreService, ILlmAnalyzerService llmAnalyzerService) : IAnalyzerService
+public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStoreService epubDocumentStoreService, ILlmAnalyzerService llmAnalyzerService) : IAnalyzerService
 {
     private readonly IScrapingService _scrapingService = scrapingService;
     private readonly IEpubDocumentStoreService _epubDocumentStoreService = epubDocumentStoreService;
@@ -30,7 +30,7 @@ public class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStor
                     {
                         var line = paragraph.Text;
                         // rubyタグがあればルビのdictionaryに登録
-                        var matches = Regex.Matches(line, "<ruby>(.*?)<rt>(.*?)</rt></ruby>");
+                        var matches = MyRegex().Matches(input: line);
                         foreach (Match match in matches)
                         {
                             var key = match.Groups[1].Value;
@@ -70,4 +70,7 @@ public class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStor
 
         return bookScripts;
     }
+
+    [GeneratedRegex("<ruby>(.*?)<rt>(.*?)</rt></ruby>")]
+    private static partial Regex MyRegex();
 }
