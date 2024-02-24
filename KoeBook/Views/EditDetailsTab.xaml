@@ -153,63 +153,6 @@
                             </ItemsRepeater.ItemTemplate>
                         </ItemsRepeater>
                     </StackPanel>
-
-                    <TextBlock
-                        Style="{StaticResource SubtitleTextBlockStyle}"
-                        Margin="{StaticResource MediumTopMargin}"
-                        Text="スタイル設定"/>
-                    <TextBlock
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
-                        Text="スタイル (喜怒哀楽) を設定します。"/>
-
-                    <StackPanel
-                        Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                        BorderThickness="1"
-                        Padding="12,8,12,8"
-                        CornerRadius="12"
-                        Margin="{StaticResource SmallTopMargin}">
-                        <TextBlock
-                            Visibility="{x:Bind ViewModel.AnalyzingTextVisibility, Mode=OneWay}"
-                            Margin="0,12,0,12"
-                            TextAlignment="Center"
-                            Text="解析が終了していないため表示できません。"/>
-
-                        <ItemsRepeater
-                            ItemsSource="{x:Bind ViewModel.BookScripts.ScriptLines, Mode=OneWay}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Orientation="Vertical" Spacing="2" />
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="editViewmodel:ScriptLineViewModel">
-                                    <ItemContainer>
-                                        <Grid
-                                            Padding="10,5,10,5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="180" />
-                                                <ColumnDefinition Width="180" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                Text="{x:Bind Character}"/>
-                                            <ComboBox
-                                                Grid.Column="1"
-                                                Width="160"
-                                                IsEnabled="{x:Bind Editable, Mode=OneWay}"
-                                                SelectedItem="{x:Bind Style, Mode=TwoWay}"
-                                                ItemsSource="{x:Bind AllowedStyles, Mode=OneWay}" />
-                                            <TextBlock
-                                                Grid.Column="2"
-                                                VerticalAlignment="Center"
-                                                Text="{x:Bind Text}"/>
-                                        </Grid>
-                                    </ItemContainer>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                    </StackPanel>
                 </StackPanel>
             </ScrollView>
         </Grid>
