@@ -106,7 +106,6 @@ namespace KoeBook.Epub
                         checkSection(document, chapterNum);
                         document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
                     }
-
                 }
                 else if (element.TagName == "DIV")
                 {
@@ -180,7 +179,6 @@ namespace KoeBook.Epub
                                             }
                                             document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
                                         }
-
                                     }
                                 }
                             }
@@ -251,7 +249,6 @@ namespace KoeBook.Epub
                             }
                         }
                     }
-
                 }
                 else if (element.TagName == "IMG")
                 {
@@ -333,7 +330,6 @@ namespace KoeBook.Epub
                                 paragraph.Text = TextProcess(element) + "の画像";
                             }
                         }
-
                     }
                     else if (element.ClassName == "notes")
                     {
@@ -451,7 +447,7 @@ namespace KoeBook.Epub
                 {
                     if (nextNode.NodeType == NodeType.Text)
                     {
-                        if (nextNode.Text() != "\n")
+                        if (!string.IsNullOrWhiteSpace(nextNode.Text()))
                         {
                             previous = true;
 
@@ -490,7 +486,6 @@ namespace KoeBook.Epub
                                     paragraph2.Text += split[^1];
                                 }
                             }
-
                         }
                         else
                         {
@@ -504,48 +499,12 @@ namespace KoeBook.Epub
                 }
             }
 
+            // 末尾の空のparagraphを削除
             document.Chapters[^1].Sections[^1].Elements.RemoveAt(document.Chapters[^1].Sections[^1].Elements.Count - 1);
 
-            if (checkEpubDocument(document))
-            {
-                Console.WriteLine("Success");
-            }
-            else
-            {
-                Console.WriteLine("False");
-            }
             return document;
         }
 
-        private bool checkEpubDocument(EpubDocument document)
-        {
-            foreach (var chapter in document.Chapters)
-            {
-                foreach (var section in chapter.Sections)
-                {
-                    foreach (var element in section.Elements)
-                    {
-                        if (element is Paragraph paragraph)
-                        {
-                            if (paragraph.Text == null)
-                            {
-                                Console.WriteLine($"{document.Chapters.IndexOf(chapter)}, {chapter.Sections.IndexOf(section)}, {section.Elements.IndexOf(element)}");
-                                return false;
-                            }
-                        }
-                        else if (element is Picture picture)
-                        {
-                            if (picture.PictureFilePath == null)
-                            {
-                                Console.WriteLine($"{document.Chapters.IndexOf(chapter)}, {chapter.Sections.IndexOf(section)}, {section.Elements.IndexOf(element)}");
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
-        }
 
         private static string TextProcess(IElement element)
         {
@@ -563,7 +522,7 @@ namespace KoeBook.Epub
                     {
                         if (node.NodeType == NodeType.Text)
                         {
-                            if (node.Text() != "\n")
+                            if (!string.IsNullOrWhiteSpace(node.Text()))
                             {
                                 text += TextReplace(node.Text());
                             }
@@ -587,14 +546,14 @@ namespace KoeBook.Epub
                         }
                         else
                         {
-                            if ((item.TextContent != "\n") && (!string.IsNullOrEmpty(item.TextContent)))
+                            if (!string.IsNullOrWhiteSpace(item.TextContent) && (!string.IsNullOrEmpty(item.TextContent)))
                             {
                                 text += TextReplace(item.TextContent);
                             }
                         }
                         if (item.NextSibling != null)
                         {
-                            if ((item.NextSibling.TextContent != "\n") && (!string.IsNullOrEmpty(item.NextSibling.TextContent)))
+                            if (!string.IsNullOrWhiteSpace(item.NextSibling.TextContent) && (!string.IsNullOrEmpty(item.NextSibling.TextContent)))
                             {
                                 text += TextReplace(item.NextSibling.Text());
                             }
@@ -655,8 +614,5 @@ namespace KoeBook.Epub
 
         [System.Text.RegularExpressions.GeneratedRegex(@"http.{1,}/([^/]{0,}\.[^/]{1,})")]
         private static partial System.Text.RegularExpressions.Regex FileUrlToFileName();
-
-        [System.Text.RegularExpressions.GeneratedRegex(@"<ruby><rb>(.{1,})</rb><rp>（</rp><rt>(.{1,})</rt><rp>）</rp></ruby>")]
-        private static partial System.Text.RegularExpressions.Regex RubyToText();
     }
 }
