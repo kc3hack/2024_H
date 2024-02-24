@@ -62,6 +62,7 @@ public partial class App : Application
                 services.AddSingleton<IAppNotificationService, AppNotificationService>();
                 services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+                services.AddSingleton<IApiRootSelectorService, ApiRootSelectorService>();
                 services.AddTransient<INavigationViewService, NavigationViewService>();
                 services.AddSingleton<ITabViewService, TabViewService>();
 
