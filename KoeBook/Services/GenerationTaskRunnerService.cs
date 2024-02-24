@@ -50,7 +50,7 @@ public class GenerationTaskRunnerService
     {
         try
         {
-            var scripts = await _analyzerService.AnalyzeAsync(new(task.Id, task.Source, task.SourceType), task.CancellationToken);
+            var scripts = await _analyzerService.AnalyzeAsync(new(task.Id, task.Source, task.SourceType), "", "", task.CancellationToken);
             task.BookScripts = scripts;
             task.State = GenerationState.Editting;
             task.Progress = 0;
