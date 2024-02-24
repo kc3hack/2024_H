@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 using KoeBook.Contracts.Services;
 using KoeBook.Core.Contracts.Services;
@@ -17,8 +15,9 @@ namespace KoeBook.ViewModels;
 public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
-
+    private readonly IApiRootSelectorService _apiRootSelectorService;
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly ISoundGenerationSelectorService _soundGenerationSelectorService;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SelectedThemeIndex))]
@@ -43,13 +42,22 @@ public partial class SettingsViewModel : ObservableRecipient
     public string ApiKeyDescription => RevealApiKey ? "表示" : "非表示";
 
     [ObservableProperty]
+    private string _styleBertVitsRoot = string.Empty;
+
+    [ObservableProperty]
     private string _versionDescription;
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService, ILocalSettingsService localSettingsService)
+    public SettingsViewModel(IThemeSelectorService themeSelectorService,
+        IApiRootSelectorService apiRootSelectorService,
+        ISoundGenerationSelectorService soundGenerationSelectorService,
+        ILocalSettingsService localSettingsService)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
         _localSettingsService = localSettingsService;
+        _apiRootSelectorService = apiRootSelectorService;
+        _styleBertVitsRoot = apiRootSelectorService.StyleBertVitsRoot;
+        _soundGenerationSelectorService = soundGenerationSelectorService;
         _versionDescription = GetVersionDescription();
     }
 
@@ -65,6 +73,17 @@ public partial class SettingsViewModel : ObservableRecipient
         static async void Core(ILocalSettingsService service, string value)
         {
             await service.SaveApiKeyAsync(value, default);
+        }
+    }
+
+    partial void OnStyleBertVitsRootChanged(string value)
+    {
+        Core(_apiRootSelectorService, _soundGenerationSelectorService, value);
+
+        static async void Core(IApiRootSelectorService service, ISoundGenerationSelectorService soundService, string root)
+        {
+            await service.SetStyleBertVitsRoot(root);
+            await soundService.InitializeAsync(default);
         }
     }
 

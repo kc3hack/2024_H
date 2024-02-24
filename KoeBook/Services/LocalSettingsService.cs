@@ -1,5 +1,4 @@
-﻿using KoeBook.Contracts.Services;
-using KoeBook.Core.Contracts.Services;
+﻿using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Helpers;
 using KoeBook.Helpers;
 using KoeBook.Models;

@@ -15,5 +15,5 @@ public class BookScripts(BookProperties bookProperties, BookOptions options)
     /// <summary>
     /// 読み上げテキストの配列
     /// </summary>
-    public required ScriptLine[] ScriptLines { get; set; }
+    public required IReadOnlyList<ScriptLine> ScriptLines { get; set; }
 }

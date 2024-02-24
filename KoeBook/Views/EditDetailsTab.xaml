@@ -6,15 +6,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:components="using:KoeBook.Components"
+    xmlns:editViewmodel="using:KoeBook.ViewModels.Edit"
     mc:Ignorable="d"
 
-    Header="{x:Bind ViewModel.Task.Title}"
->
+    Header="{x:Bind ViewModel.Task.Title}">
     <TabViewItem.IconSource>
         <SymbolIconSource Symbol="Edit" />
     </TabViewItem.IconSource>
     <TabViewItem.Content>
-        <Grid Margin="20,10,20,0">
+        <Grid Margin="20,10,20,10">
             <ScrollView
                 x:Name="ContentArea"
                 ZoomMode="Disabled"
@@ -55,6 +55,18 @@
                         <TextBlock
                             Style="{StaticResource BodyStrongTextBlockStyle}"
                             Margin="{StaticResource XSmallTopMargin}"
+                            Text="編集スキップ"
+                            ToolTipService.ToolTip="キャラクターなどの編集を行わずにそのまま実行します"/>
+                        <ToggleSwitch
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            OffContent="編集する"
+                            OnContent="編集しない"
+                            IsEnabled="{x:Bind ViewModel.Task.SkipEditChangable, Mode=OneWay}"
+                            IsOn="{x:Bind ViewModel.Task.SkipEdit, Mode=TwoWay}"/>
+
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Margin="{StaticResource XSmallTopMargin}"
                             Text="実行状況"
                             ToolTipService.ToolTip=""/>
                         <components:StateProgressBar
@@ -78,6 +90,68 @@
                                 HorizontalAlignment="Right"
                                 Text="{x:Bind ViewModel.Task.ProgressText, Mode=OneWay}" />
                         </Grid>
+
+                        <Button
+                            Margin="{StaticResource SmallTopMargin}"
+                            Command="{x:Bind ViewModel.StartGenerationAsyncCommand}"
+                            IsEnabled="{x:Bind ViewModel.Task.Editable, Mode=OneWay}"
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Content="生成開始"/>
+                        <TextBlock
+                            Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                            Style="{ThemeResource CaptionTextBlockStyle}"
+                            Text="編集はできなくなります" />
+                    </StackPanel>
+
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Margin="{StaticResource MediumTopMargin}"
+                        Text="モデル設定"/>
+                    <TextBlock
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                        Text="キャラクターごとにどのモデルを使用するか設定します。"/>
+
+                    <StackPanel
+                        Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                        BorderThickness="1"
+                        Padding="12,8,12,8"
+                        CornerRadius="12"
+                        Margin="{StaticResource SmallTopMargin}">
+                        <TextBlock
+                            Visibility="{x:Bind ViewModel.AnalyzingTextVisibility, Mode=OneWay}"
+                            Margin="0,12,0,12"
+                            TextAlignment="Center"
+                            Text="解析が終了していないため表示できません。"/>
+                        <ItemsRepeater
+                            ItemsSource="{x:Bind ViewModel.BookScripts.CharacterMapping, Mode=OneWay}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Orientation="Vertical" Spacing="2" />
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="editViewmodel:CharacterModelPairViewModel">
+                                    <ItemContainer>
+                                        <Grid
+                                            Padding="10,5,10,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="360" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="{x:Bind Character}"
+                                                VerticalAlignment="Center"/>
+                                            <ComboBox
+                                                Grid.Column="1"
+                                                Width="360"
+                                                IsEnabled="{x:Bind Editable, Mode=OneWay}"
+                                                ItemsSource="{x:Bind AllowedModels}"
+                                                SelectedItem="{x:Bind Model, Mode=TwoWay}"/>
+                                        </Grid>
+                                    </ItemContainer>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
                     </StackPanel>
                 </StackPanel>
             </ScrollView>

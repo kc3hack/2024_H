@@ -1,14 +1,16 @@
-﻿namespace KoeBook.Core.Models;
+﻿using KoeBook.Epub;
+
+namespace KoeBook.Core.Models;
 
 /// <summary>
 /// 読み上げ1行分
 /// </summary>
-public class ScriptLine(string id, string text, string character, string style)
+public class ScriptLine(Paragraph paragraph, string text, string character, string style)
 {
     /// <summary>
     /// 読み上げ位置との関連付け
     /// </summary>
-    public string Id { get; } = id;
+    public Paragraph Paragraph { get; } = paragraph;
 
     /// <summary>
     /// 読み上げテキスト
