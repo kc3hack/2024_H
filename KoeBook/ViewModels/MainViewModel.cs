@@ -114,7 +114,7 @@ public sealed partial class MainViewModel : ObservableRecipient
         if (EbookFilePath is null || string.IsNullOrEmpty(args.NewText))
             return;
 
-        var result = await _dialogService.ShowAsync("外部URLから使用する場合、ローカルファイルは無視されます。", default);
+        var result = await _dialogService.ShowAsync("ローカルファイルを無視します", "外部URLから使用する場合、ローカルファイルは無視されます。", default);
         if (result == ContentDialogResult.Primary)
         {
             EbookFilePath = null;
