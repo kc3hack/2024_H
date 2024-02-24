@@ -40,4 +40,7 @@ public enum ExceptionType
 
     [EnumMember(Value = "有効な Style Bert VITS のAPIルートを設定してください")]
     UnknownStyleBertVitsRoot,
+
+    [EnumMember(Value = "GPT4による話者・スタイル設定に失敗しました")]
+    Gpt4TalkerAndStyleSettingFailed,
 }
