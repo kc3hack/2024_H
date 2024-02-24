@@ -11,9 +11,7 @@ internal static class ScrapingHelper
         {
             document.Chapters.Add(new Chapter() { Title = null });
         }
-
         return;
-
     }
 
     internal static void checkSection(EpubDocument document, int ChapterNum)
@@ -26,11 +24,12 @@ internal static class ScrapingHelper
             if (document.Chapters[ChapterNum].Title != null)
             {
                 document.Chapters[ChapterNum].Sections.Add(new Section(document.Chapters[ChapterNum].Title!));
-            } else
+            }
+            else
             {
                 document.Chapters[ChapterNum].Sections.Add(new Section(document.Title));
             }
-            
+
         }
         return;
     }
@@ -43,5 +42,40 @@ internal static class ScrapingHelper
             document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
         }
         return;
+    }
+
+    public static List<string> SplitBrace(string text)
+    {
+        var result = new List<string>();
+        int bracket = 0;
+        var brackets = new List<int>();
+        foreach (char c in text)
+        {
+            if (c == '「') bracket++;
+            if (c == '」') bracket--;
+            brackets.Add(bracket);
+        }
+        var mn = Math.Min(0, brackets.Min());
+        int startIdx = 0;
+        for (int i = 0; i < brackets.Count; i++)
+        {
+            brackets[i] -= mn;
+            if (text[i] == '「' && brackets[i] == 1 && i != 0)
+            {
+                result.Add(text[startIdx..(i - startIdx)]);
+                startIdx = i;
+            }
+            if (text[i] == '」' && brackets[i] == 0 && i != 0)
+            {
+                result.Add(text[startIdx..(i - startIdx + 1)]);
+                startIdx = i + 1;
+            }
+        }
+        if (startIdx != text.Length - 1)
+        {
+            result.Add(text[startIdx..]);
+        }
+
+        return result;
     }
 }

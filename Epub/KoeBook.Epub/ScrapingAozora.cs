@@ -47,7 +47,7 @@ namespace KoeBook.Epub
             var contents = doc.QuerySelectorAll(".midashi_anchor");
 
             // 目次からEpubDocumentを構成
-            List<int> contentsIds = new List<int>() {0};
+            List<int> contentsIds = new List<int>() { 0 };
             // Chapter, Section が存在するとき、それぞれtrue
             chapterExist = false;
             sectionExist = false;
@@ -61,22 +61,23 @@ namespace KoeBook.Epub
                         var MidashiId = int.Parse(midashi.Id.Replace("midashi", ""));
                         if ((MidashiId - previousMidashiId) == 100)
                         {
-                            document.Chapters.Add(new Chapter() { Title = TextReplace(TextProcess(midashi, document))});
+                            document.Chapters.Add(new Chapter() { Title = TextProcess(midashi) });
                             chapterExist = true;
                         }
                         if ((MidashiId - previousMidashiId) == 10)
                         {
                             checkChapter(document);
-                            document.Chapters[^1].Sections.Add(new Section(TextProcess(midashi, document)));
+                            document.Chapters[^1].Sections.Add(new Section(TextProcess(midashi)));
                             sectionExist = true;
                         }
                         contentsIds.Add(MidashiId);
                         previousMidashiId = MidashiId;
                     }
                 }
-            } else
+            }
+            else
             {
-                document.Chapters.Add(new Chapter() { Title = null});
+                document.Chapters.Add(new Chapter() { Title = null });
                 document.Chapters[^1].Sections.Add(new Section(bookTitle.InnerHtml));
             }
 
@@ -105,12 +106,13 @@ namespace KoeBook.Epub
                         document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
                     }
 
-                } else if (element.TagName == "DIV")
+                }
+                else if (element.TagName == "DIV")
                 {
                     var midashi = element.QuerySelector(".midashi_anchor");
                     if (midashi != null)
                     {
-                        if(midashi.Id != null)
+                        if (midashi.Id != null)
                         {
                             if (int.TryParse(midashi.Id.Replace("midashi", ""), out var midashiId))
                             {
@@ -120,7 +122,7 @@ namespace KoeBook.Epub
                                     switch (contentsIds[contentsId] - contentsIds[contentsId - 1])
                                     {
                                         case 100:
-                                            if (chapterNum > 0)
+                                            if (chapterNum >= 0 && sectionNum >= 0)
                                             {
                                                 document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
                                             }
@@ -128,12 +130,12 @@ namespace KoeBook.Epub
                                             sectionNum = -1;
                                             break;
                                         case 10:
-                                            if ( chapterNum == -1)
+                                            if (chapterNum == -1)
                                             {
                                                 chapterNum++;
                                                 sectionNum = -1;
                                             }
-                                            if (sectionNum > 0)
+                                            if (chapterNum >= 0 && sectionNum >= 0)
                                             {
                                                 document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
                                             }
@@ -142,17 +144,14 @@ namespace KoeBook.Epub
                                         default:
                                             break;
                                     }
-                                } else //小見出し、行中小見出しの処理
+                                }
+                                else //小見出し、行中小見出しの処理
                                 {
                                     if (chapterNum == -1)
                                     {
                                         if (chapterExist)
                                         {
                                             document.Chapters.Insert(0, new Chapter());
-                                        }
-                                        if (chapterNum > 0)
-                                        {
-                                            document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
                                         }
                                         chapterNum++;
                                         sectionNum = -1;
@@ -169,19 +168,32 @@ namespace KoeBook.Epub
                                     checkParagraph(document, chapterNum, sectionNum);
                                     if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                                     {
-                                        paragraph.Text += TextReplace(TextProcess(midashi, document));
+                                        paragraph.Text += TextProcess(midashi);
                                         document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+
+                                        foreach (var splitText in SplitBrace(TextProcess(midashi)))
+                                        {
+                                            if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                            {
+                                                paragraph1.Text += splitText;
+                                            }
+                                            document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                        }
+
                                     }
                                 }
-                            } else
+                            }
+                            else
                             {
                                 throw new EpubDocumentException($"Unexpected id of Anchor tag was found: id = {midashi.Id}");
                             }
-                        } else
+                        }
+                        else
                         {
                             throw new EpubDocumentException("Unecpected structure of HTML File: div tag with class=\"midashi_anchor\", but id=\"midashi___\" exist");
                         }
-                    } else
+                    }
+                    else
                     {
                         if (element.ClassName == "caption")
                         {
@@ -189,7 +201,19 @@ namespace KoeBook.Epub
                             checkParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
-                                paragraph.Text += TextReplace(TextProcess(element, document));
+                                var split = SplitBrace(TextProcess(element));
+                                for (int i = 0; i < split.Count - 1; i++)
+                                {
+                                    if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                    {
+                                        paragraph1.Text += split[i];
+                                    }
+                                    document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                }
+                                if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph2)
+                                {
+                                    paragraph2.Text += split[^1];
+                                }
                             }
                         }
                         else
@@ -215,12 +239,20 @@ namespace KoeBook.Epub
                             checkParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
-                                paragraph.Text += TextReplace(TextProcess(element, document));
+                                foreach (var splitText in SplitBrace(TextProcess(element)))
+                                {
+                                    if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                    {
+                                        paragraph1.Text += splitText;
+                                    }
+                                    document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                }
                             }
                         }
                     }
 
-                } else if (element.TagName == "IMG")
+                }
+                else if (element.TagName == "IMG")
                 {
                     if (element is IHtmlImageElement img)
                     {
@@ -281,7 +313,8 @@ namespace KoeBook.Epub
                             }
                         }
                     }
-                } else if (element.TagName == "SPAN")
+                }
+                else if (element.TagName == "SPAN")
                 {
                     if (element.ClassName == "caption")
                     {
@@ -289,17 +322,19 @@ namespace KoeBook.Epub
                         {
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^2] is Paragraph paragraph))
                             {
-                                paragraph.Text = TextProcess(element, document) + "の画像";  
+                                paragraph.Text = TextProcess(element) + "の画像";
                             }
-                        } else
+                        }
+                        else
                         {
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
-                                paragraph.Text = TextProcess(element, document ) + "の画像";
+                                paragraph.Text = TextProcess(element) + "の画像";
                             }
                         }
-                        
-                    } else if (element.ClassName == "notes")
+
+                    }
+                    else if (element.ClassName == "notes")
                     {
                         switch (element.InnerHtml)
                         {
@@ -317,12 +352,19 @@ namespace KoeBook.Epub
                                 checkParagraph(document, chapterNum, sectionNum);
                                 if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                                 {
-                                    paragraph.Text += TextReplace(element.InnerHtml);
-                                    document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                    foreach (var splitText in SplitBrace(TextProcess(element)))
+                                    {
+                                        if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                        {
+                                            paragraph1.Text += splitText;
+                                        }
+                                        document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                    }
                                 }
                                 break;
                         }
-                    } else
+                    }
+                    else
                     {
                         if (chapterNum == -1)
                         {
@@ -345,11 +387,24 @@ namespace KoeBook.Epub
                         checkParagraph(document, chapterNum, sectionNum);
                         if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                         {
-                            paragraph.Text += TextReplace(TextProcess(element, document));
+                            var split = SplitBrace(TextProcess(element));
+                            for (int i = 0; i < split.Count - 1; i++)
+                            {
+                                if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                {
+                                    paragraph1.Text += split[i];
+                                }
+                                document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                            }
+                            if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph2)
+                            {
+                                paragraph2.Text += split[^1];
+                            }
                         }
                         // 想定していない構造が見つかったことをログに出力した方が良い？
                     }
-                } else
+                }
+                else
                 {
                     if (chapterNum == -1)
                     {
@@ -372,7 +427,21 @@ namespace KoeBook.Epub
                     checkParagraph(document, chapterNum, sectionNum);
                     if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                     {
-                        paragraph.Text += TextReplace(TextProcess(element, document));
+                        paragraph.Text += TextProcess(element);
+
+                        var split = SplitBrace(TextProcess(element));
+                        for (int i = 0; i < split.Count - 1; i++)
+                        {
+                            if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                            {
+                                paragraph1.Text += split[i];
+                            }
+                            document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                        }
+                        if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph2)
+                        {
+                            paragraph2.Text += split[^1];
+                        }
                     }
                     // 想定していない構造が見つかったことをログに出力した方が良い？
                 }
@@ -406,14 +475,28 @@ namespace KoeBook.Epub
                             checkParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
-                                paragraph.Text += TextReplace(nextNode.Text());
+                                var split = SplitBrace(TextReplace(nextNode.Text()));
+                                for (int i = 0; i < split.Count - 1; i++)
+                                {
+                                    if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                    {
+                                        paragraph1.Text += split[i];
+                                    }
+                                    document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                }
+                                if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph2)
+                                {
+                                    paragraph2.Text += split[^1];
+                                }
                             }
 
-                        } else
+                        }
+                        else
                         {
                             previous = false;
                         }
-                    } else
+                    }
+                    else
                     {
                         previous = false;
                     }
@@ -425,7 +508,8 @@ namespace KoeBook.Epub
             if (checkEpubDocument(document))
             {
                 Console.WriteLine("Success");
-            } else
+            }
+            else
             {
                 Console.WriteLine("False");
             }
@@ -447,7 +531,8 @@ namespace KoeBook.Epub
                                 Console.WriteLine($"{document.Chapters.IndexOf(chapter)}, {chapter.Sections.IndexOf(section)}, {section.Elements.IndexOf(element)}");
                                 return false;
                             }
-                        } else if (element is Picture picture)
+                        }
+                        else if (element is Picture picture)
                         {
                             if (picture.PictureFilePath == null)
                             {
@@ -461,13 +546,14 @@ namespace KoeBook.Epub
             return true;
         }
 
-        private string TextProcess(IElement element, EpubDocument document)
+        private static string TextProcess(IElement element)
         {
             string text = "";
             if (element.ChildElementCount == 0)
             {
                 text += TextReplace(element.InnerHtml);
-            } else
+            }
+            else
             {
                 var rubies = element.QuerySelectorAll("ruby");
                 if (rubies.Length > 0)
@@ -488,15 +574,17 @@ namespace KoeBook.Epub
                         {
                             if (item.QuerySelectorAll("img").Length > 0)
                             {
-                                if(item.QuerySelector("rt") != null)
+                                if (item.QuerySelector("rt") != null)
                                 {
                                     text += TextReplace(item.QuerySelector("rt")!.TextContent);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 text += TextReplace(item.OuterHtml);
                             }
-                        } else
+                        }
+                        else
                         {
                             if ((item.TextContent != "\n") && (!string.IsNullOrEmpty(item.TextContent)))
                             {
@@ -511,7 +599,8 @@ namespace KoeBook.Epub
                             }
                         }
                     }
-                } else if(element.TagName == "RUBY")
+                }
+                else if (element.TagName == "RUBY")
                 {
                     if (element.QuerySelectorAll("img").Length > 0)
                     {
@@ -524,7 +613,8 @@ namespace KoeBook.Epub
                     {
                         text += TextReplace(element.OuterHtml);
                     }
-                } else
+                }
+                else
                 {
                     text += TextReplace(element.TextContent);
                 }
@@ -543,7 +633,7 @@ namespace KoeBook.Epub
             returnText = returnText.Replace("\n", "");
             return returnText;
         }
-        
+
 
         private static string GetCardUrl(string url)
         {

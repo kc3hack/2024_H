@@ -8,6 +8,6 @@ namespace KoeBook.Epub
 {
     public class EpubDocumentException : Exception
     {
-        public EpubDocumentException(string? message) : base(message) {}
+        public EpubDocumentException(string? message) : base(message) { }
     }
 }
