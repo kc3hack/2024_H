@@ -42,4 +42,15 @@ public class DialogService : IDialogService
     {
         return ShowAsync(title, new DialogContentControl(content), primaryText, closeText, defaultButton, cancellationToken);
     }
+
+    public Task<ContentDialogResult> ShowInfoAsync(string title, string content, string primaryText, CancellationToken cancellationToken)
+    {
+        var dialog = new SharedContentDialog(title, primaryText, null, ContentDialogButton.Primary)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot,
+            Content = new DialogContentControl(content),
+            RequestedTheme = _themeSelectorService.Theme
+        };
+        return dialog.ShowAsync().AsTask(cancellationToken);
+    }
 }
