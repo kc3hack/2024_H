@@ -16,22 +16,9 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
         var document = _documentStoreService.Documents.Where(doc => doc.Id == bookScripts.BookProperties.Id).FirstOrDefault()
             ?? throw new InvalidOperationException($"The epub document ({bookScripts.BookProperties.Id}) can't be found.");
 
-        for (int i = 0; i < document.Chapters.Count; i++)
+        foreach (var scriptLine in bookScripts.ScriptLines)
         {
-            for (int j = 0; j < document.Chapters[i].Sections.Count; j++)
-            {
-                for (int k = 0; k < document.Chapters[i].Sections[j].Elements.Count; k++)
-                {
-                    if (document.Chapters[i].Sections[j].Elements[k] is Paragraph para)
-                    {
-                        var scriptLine = bookScripts.ScriptLines.Where(sl => sl.Id == $"{document.Chapters[i].Sections[j].Id}_p{k}").FirstOrDefault();
-                        if (scriptLine != null)
-                        {
-                            para.Audio = new Audio(await _soundGenerationService.GenerateLineSoundAsync(scriptLine, bookScripts.Options, cancellationToken));
-                        }
-                    }
-                }
-            }
+            scriptLine.Paragraph.Audio = new Audio(await _soundGenerationService.GenerateLineSoundAsync(scriptLine, bookScripts.Options, cancellationToken));
         }
 
         if (await document.TryCreateEpubAsync(tempDirectory, bookScripts.BookProperties.Id.ToString(), cancellationToken))

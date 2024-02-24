@@ -1,6 +1,7 @@
 ﻿using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Helpers;
 using KoeBook.Core.Models;
+using KoeBook.Epub;
 using static KoeBook.Core.Helpers.IDisplayStateChangeEx;
 
 namespace KoeBook.Services.CoreMocks;
@@ -38,9 +39,9 @@ public class AnalyzerServiceMock(IDisplayStateChangeService stateService) : IAna
         return new(bookProperties, new(characterMapping))
         {
             ScriptLines = [
-                new("a", "読み上げテキスト1", "Hoge", "Angry"),
-                new("b", "読み上げテキスト2", "Fuga", "Sad"),
-                new("c", "読み上げテキスト3", "Narration", "Narration"),
+                new(new Paragraph { Text = "a" }, "読み上げテキスト1", "Hoge", "Angry"),
+                new(new Paragraph { Text = "b" }, "読み上げテキスト2", "Fuga", "Sad"),
+                new(new Paragraph { Text = "c" }, "読み上げテキスト3", "Narration", "Narration"),
             ],
         };
     }
