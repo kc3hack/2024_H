@@ -3,7 +3,7 @@ using System.Reflection.Metadata;
 
 namespace KoeBook.Epub;
 
-internal static class ScrapingHelper
+public static class ScrapingHelper
 {
     internal static void checkChapter(EpubDocument document)
     {
@@ -46,6 +46,10 @@ internal static class ScrapingHelper
 
     public static List<string> SplitBrace(string text)
     {
+        if (text.Length == 1 && text != "「" && text != "」")
+        {
+            return new List<string>() { text };
+        }
         var result = new List<string>();
         int bracket = 0;
         var brackets = new List<int>();
@@ -62,18 +66,22 @@ internal static class ScrapingHelper
             brackets[i] -= mn;
             if (text[i] == '「' && brackets[i] == 1 && i != 0)
             {
-                result.Add(text[startIdx..(i - startIdx)]);
+                result.Add(text[startIdx..i]);
                 startIdx = i;
             }
             if (text[i] == '」' && brackets[i] == 0 && i != 0)
             {
-                result.Add(text[startIdx..(i - startIdx + 1)]);
+                result.Add(text[startIdx..(i + 1)]);
                 startIdx = i + 1;
             }
         }
         if (startIdx != text.Length - 1)
         {
             result.Add(text[startIdx..]);
+        }
+        if (result[^1] == "")
+        {
+            result.RemoveAt(result.Count - 1);
         }
 
         return result;
