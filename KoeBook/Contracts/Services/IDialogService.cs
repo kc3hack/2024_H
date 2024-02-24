@@ -19,6 +19,12 @@ public interface IDialogService
         string closeText,
         ContentDialogButton defaultButton,
         CancellationToken cancellationToken);
+
+    Task<ContentDialogResult> ShowInfoAsync(
+        string title,
+        string content,
+        string primaryText,
+        CancellationToken cancellationToken);
 }
 
 public static class DialogServiceEx

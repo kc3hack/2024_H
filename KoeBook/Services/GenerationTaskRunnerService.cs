@@ -1,4 +1,6 @@
-﻿using KoeBook.Contracts.Services;
+﻿using FastEnumUtility;
+using KoeBook.Contracts.Services;
+using KoeBook.Core;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Models;
 using KoeBook.Models;
@@ -9,19 +11,22 @@ namespace KoeBook.Services;
 public class GenerationTaskRunnerService
 {
     private readonly IGenerationTaskService _taskService;
-
     private readonly IAnalyzerService _analyzerService;
-
     private readonly IEpubGenerateService _epubGenService;
-
+    private readonly IDialogService _dialogService;
     private readonly string _tempFolder = ApplicationData.Current.TemporaryFolder.Path;
 
-    public GenerationTaskRunnerService(IGenerationTaskService taskService, IAnalyzerService analyzerService, IEpubGenerateService epubGenService)
+    public GenerationTaskRunnerService(
+        IGenerationTaskService taskService,
+        IAnalyzerService analyzerService,
+        IEpubGenerateService epubGenService,
+        IDialogService dialogService)
     {
         _taskService = taskService;
         _taskService.OnTasksChanged += TasksChanged;
         _analyzerService = analyzerService;
         _epubGenService = epubGenService;
+        _dialogService = dialogService;
     }
 
     private async void TasksChanged(GenerationTask task, ChangedEvents changedEvents)
@@ -62,6 +67,11 @@ public class GenerationTaskRunnerService
         {
             task.State = GenerationState.Failed;
         }
+        catch (EbookException e)
+        {
+            task.State = GenerationState.Failed;
+            await _dialogService.ShowInfoAsync("生成失敗", e.ExceptionType.GetEnumMemberValue()!, "OK", default);
+        }
         catch
         {
             task.State = GenerationState.Failed;
@@ -82,6 +92,11 @@ public class GenerationTaskRunnerService
         catch (OperationCanceledException)
         {
             task.State = GenerationState.Failed;
+        }
+        catch (EbookException e)
+        {
+            task.State = GenerationState.Failed;
+            await _dialogService.ShowInfoAsync("生成失敗", e.ExceptionType.GetEnumMemberValue()!, "OK", default);
         }
         catch
         {

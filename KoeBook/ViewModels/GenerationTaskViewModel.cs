@@ -31,7 +31,7 @@ public partial class GenerationTaskViewModel(ITabViewService tabViewService, Gen
         if (Task is null)
             return;
 
-        var result = await _dialogService.ShowAsync("KoeBookからのお知らせ", "実行中のタスクをキャンセルし、削除します。この操作は戻せません。", "削除", cancellationToken);
+        var result = await _dialogService.ShowAsync("タスクを削除します", "実行中のタスクをキャンセルし、削除します。この操作は戻せません。", "削除", cancellationToken);
         if (result != ContentDialogResult.Primary)
             return;
         _runner.StopTask(Task);

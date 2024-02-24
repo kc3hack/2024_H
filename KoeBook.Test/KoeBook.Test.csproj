@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Epub\KoeBook.Epub\KoeBook.Epub.csproj" />
-    <ProjectReference Include="..\KoeBook.Common\KoeBook.Common.csproj" />
     <ProjectReference Include="..\KoeBook.Core\KoeBook.Core.csproj" />
   </ItemGroup>
 
