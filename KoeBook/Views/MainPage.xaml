@@ -12,50 +12,82 @@
         ZoomMode="Disabled"
         HorizontalScrollMode="Disabled">
         <StackPanel>
+            <Grid
+                ColumnSpacing="12"
+                RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="240" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-            <TextBlock
-                Style="{StaticResource TitleTextBlockStyle}"
-                Text="書籍選択"/>
-
-            <StackPanel
-                Background="{ThemeResource CardBackgroundFillColorDefault}"
-                BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                BorderThickness="1"
-                Padding="24,16,24,16"
-                CornerRadius="12"
-                Margin="{StaticResource SmallTopMargin}"
-                HorizontalAlignment="Stretch">
-
-                <StackPanel>
-                    <TextBlock Text="EPubファイルを読み上げる"/>
-                    <StackPanel Orientation="Horizontal" Margin="{StaticResource XSmallTopMargin}">
-                        <Button
-                            Command="{x:Bind ViewModel.OpenEBookFileCommand}"
-                            Content="ファイルを選択する"/>
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Padding="30,0,0,0"
-                            TextWrapping="Wrap"
-                            Style="{StaticResource BodyTextStyle}"
-                            Text="{x:Bind ViewModel.EbookFileName, Mode=OneWay}"/>
-                    </StackPanel>
-                </StackPanel>
+                <TextBlock
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="書籍選択"/>
 
                 <StackPanel
-                        Margin="{StaticResource SmallTopBottomMargin}">
-                    <TextBlock Text="外部サイトを読み上げる (未対応)"/>
-                    <TextBox
-                        Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        BeforeTextChanging="{x:Bind ViewModel.BeforeTextChanging}"
-                        Margin="{StaticResource XSmallTopMargin}" />
+                    Grid.Row="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                    BorderThickness="1"
+                    Padding="24,16,24,16"
+                    CornerRadius="12"
+                    HorizontalAlignment="Stretch">
+
+                    <!--TODO:EPUB対応
+                    <StackPanel>
+                        <TextBlock Text="EPubファイルを読み上げる"/>
+                        <StackPanel Orientation="Horizontal" Margin="{StaticResource XSmallTopMargin}">
+                            <Button
+                                Command="{x:Bind ViewModel.OpenEBookFileCommand}"
+                                Content="ファイルを選択する"/>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Padding="30,0,0,0"
+                                TextWrapping="Wrap"
+                                Style="{StaticResource BodyTextStyle}"
+                                Text="{x:Bind ViewModel.EbookFileName, Mode=OneWay}"/>
+                        </StackPanel>
+                    </StackPanel>-->
+
+                    <StackPanel>
+                        <TextBlock Text="青空文庫を読み上げる"/>
+                        <TextBox
+                            Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            BeforeTextChanging="{x:Bind ViewModel.BeforeTextChanging}"
+                            Margin="{StaticResource XSmallTopMargin}" />
+                    </StackPanel>
+
+                    <Button
+                        Style="{StaticResource AccentButtonStyle}"
+                        Margin="{StaticResource SmallTopMargin}"
+                        Command="{x:Bind ViewModel.StartProcessCommand}"
+                        Content="読み上げを作成" />
                 </StackPanel>
 
-                <Button
-                    Style="{StaticResource AccentButtonStyle}"
-                    Margin="{StaticResource SmallTopMargin}"
-                    Command="{x:Bind ViewModel.StartProcessCommand}"
-                    Content="読み上げを作成" />
-            </StackPanel>
+                <TextBlock
+                    Grid.Column="1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    VerticalAlignment="Bottom"
+                    Text="オプション" />
+
+                <StackPanel
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefault}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                    BorderThickness="1"
+                    Padding="24,16,24,16"
+                    CornerRadius="12">
+                    <ToggleSwitch
+                        IsOn="{x:Bind ViewModel.SkipEdit, Mode=TwoWay}"
+                        OffContent="編集する"
+                        OnContent="編集をスキップする"/>
+                </StackPanel>
+            </Grid>
 
             <StackPanel
                 Margin="{StaticResource MediumTopMargin}">
@@ -93,6 +125,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
                                             <Grid
@@ -116,8 +149,16 @@
                                             <Button
                                                 Grid.Column="2"
                                                 VerticalAlignment="Center"
+                                                Margin="{StaticResource SmallLeftMargin}"
                                                 Content="詳細"
                                                 Command="{x:Bind OpenEditTabCommand}"/>
+                                            <Button
+                                                Grid.Column="3"
+                                                VerticalAlignment="Center"
+                                                Margin="{StaticResource SmallLeftMargin}"
+                                                Command="{x:Bind StopTaskCommand}">
+                                                <SymbolIcon Symbol="Cancel" />
+                                            </Button>
                                         </Grid>
 
                                         <Grid

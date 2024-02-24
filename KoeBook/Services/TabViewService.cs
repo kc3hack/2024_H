@@ -8,17 +8,32 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace KoeBook.Services;
 
-public class TabViewService : ITabViewService
+public sealed class TabViewService : ITabViewService, IDisposable
 {
     private readonly IGenerationTaskService _taskService;
 
     private TabView? _tabView;
 
-    private Thickness TabContentThickness => new(20, 10, 20, 0);
+    private static Thickness TabContentThickness => new(20, 10, 20, 10);
 
-    public TabViewService(IGenerationTaskService processingTaskService)
+    private bool _disposed;
+
+    public TabViewService(IGenerationTaskService taskService)
     {
-        _taskService = processingTaskService;
+        _taskService = taskService;
+        _taskService.OnTasksChanged += OnTasksChanged;
+    }
+
+    private void OnTasksChanged(GenerationTask task, ChangedEvents e)
+    {
+        if (e == ChangedEvents.Unregistered)
+        {
+            var tab = GetExistingTab(task.Id);
+            if (tab is not null)
+            {
+                _tabView!.TabItems.Remove(tab);
+            }
+        }
     }
 
     [MemberNotNull(nameof(_tabView))]
@@ -113,5 +128,14 @@ public class TabViewService : ITabViewService
             return tabId == id;
 
         return false;
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _taskService.OnTasksChanged -= OnTasksChanged;
+            _disposed = true;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KoeBook.Contracts.Services;
 using KoeBook.Models;
+using KoeBook.Services;
 using Microsoft.UI.Xaml;
 
 namespace KoeBook.ViewModels;
@@ -10,6 +11,7 @@ namespace KoeBook.ViewModels;
 public sealed partial class TaskListViewModel : ObservableObject
 {
     private readonly ITabViewService _tabViewService;
+    private readonly GenerationTaskRunnerService _generationTaskRunnerService;
 
     public ObservableCollection<GenerationTaskViewModel> GenerationTasks { get; }
 
@@ -17,13 +19,19 @@ public sealed partial class TaskListViewModel : ObservableObject
 
     public Visibility InfoVisibility => GenerationTasks.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    public TaskListViewModel(IGenerationTaskService taskService, ITabViewService tabViewService)
+    public TaskListViewModel(IGenerationTaskService taskService, ITabViewService tabViewService, GenerationTaskRunnerService runnerService)
     {
         GenerationTasks = new(taskService.Tasks
-            .Select(t => new GenerationTaskViewModel(t, tabViewService)));
+            .Select(t =>
+            {
+                var viewModel = App.GetService<GenerationTaskViewModel>();
+                viewModel.Task = t;
+                return viewModel;
+            }));
         GenerationTasks.CollectionChanged += TaskCollectionChanged;
         taskService.OnTasksChanged += OnTasksChanged;
         _tabViewService = tabViewService;
+        _generationTaskRunnerService = runnerService;
     }
 
     private void OnTasksChanged(GenerationTask task, ChangedEvents action)
@@ -31,12 +39,16 @@ public sealed partial class TaskListViewModel : ObservableObject
         switch (action)
         {
             case ChangedEvents.Registered:
-                GenerationTasks.Insert(0, new(task, _tabViewService));
+                {
+                    var viewModel = App.GetService<GenerationTaskViewModel>();
+                    viewModel.Task = task;
+                    GenerationTasks.Insert(0, viewModel);
+                }
                 break;
             case ChangedEvents.Unregistered:
                 {
                     var id = task.Id;
-                    var taskViewModel = GenerationTasks.FirstOrDefault(tvm => tvm.Task.Id == id);
+                    var taskViewModel = GenerationTasks.FirstOrDefault(tvm => tvm.Task?.Id == id);
                     if (taskViewModel is not null)
                         GenerationTasks.Remove(taskViewModel);
                     break;

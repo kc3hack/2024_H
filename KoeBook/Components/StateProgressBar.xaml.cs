@@ -50,7 +50,7 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
         const int ItemWidth = 80;
         var state = State;
         if (state == GenerationState.Failed)
-            return position <= 0 ? 0 : SourceType == SourceType.FilePath ? ItemWidth * 5 : ItemWidth * 6;
+            return position <= 0 ? 0 : SourceType == SourceType.FilePath ? ItemWidth * 6 : ItemWidth * 7;
 
         if (SourceType != SourceType.FilePath)
         {
@@ -58,7 +58,7 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
             {
                 < 0 => (int)state * ItemWidth,
                 0 => ItemWidth,
-                > 0 => (5 - (int)state) * ItemWidth,
+                > 0 => (6 - (int)state) * ItemWidth,
             };
         }
         else
@@ -70,7 +70,7 @@ public sealed partial class StateProgressBar : UserControl, INotifyPropertyChang
             {
                 < 0 => (int)state * ItemWidth,
                 0 => ItemWidth,
-                > 0 => (4 - (int)state) * ItemWidth,
+                > 0 => (5 - (int)state) * ItemWidth,
             };
         }
     }

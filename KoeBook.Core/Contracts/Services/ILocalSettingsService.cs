@@ -1,4 +1,4 @@
-﻿namespace KoeBook.Contracts.Services;
+﻿namespace KoeBook.Core.Contracts.Services;
 
 public interface ILocalSettingsService
 {

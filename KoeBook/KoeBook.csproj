@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\Dialog\DialogContentControl.xaml" />
+    <None Remove="Components\Dialog\SharedContentDialog.xaml" />
     <None Remove="Components\StateProgressBar.xaml" />
     <None Remove="Views\EditDetailsTab.xaml" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
     <PackageReference Include="FastEnum" Version="1.8.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
     <PackageReference Include="ReactiveProperty" Version="9.4.1" />
@@ -43,6 +45,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Components\Dialog\SharedContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Components\StateProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
