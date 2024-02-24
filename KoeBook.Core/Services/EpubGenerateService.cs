@@ -18,10 +18,10 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
 
         foreach (var scriptLine in bookScripts.ScriptLines)
         {
-            scriptLine.Paragraph.Audio = new Audio(await _soundGenerationService.GenerateLineSoundAsync(scriptLine, bookScripts.Options, cancellationToken));
+            scriptLine.Paragraph.Audio = new Audio(await _soundGenerationService.GenerateLineSoundAsync(scriptLine, bookScripts.Options, cancellationToken).ConfigureAwait(false));
         }
 
-        if (await document.TryCreateEpubAsync(tempDirectory, bookScripts.BookProperties.Id.ToString(), cancellationToken))
+        if (await document.TryCreateEpubAsync(tempDirectory, bookScripts.BookProperties.Id.ToString(), cancellationToken).ConfigureAwait(false))
         {
             _documentStoreService.Unregister(bookScripts.BookProperties.Id);
             return Path.Combine(tempDirectory, $"{bookScripts.BookProperties.Id}.epub");
