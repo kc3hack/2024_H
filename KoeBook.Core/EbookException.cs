@@ -43,4 +43,7 @@ public enum ExceptionType
 
     [EnumMember(Value = "GPT4による話者・スタイル設定に失敗しました")]
     Gpt4TalkerAndStyleSettingFailed,
+
+    [EnumMember(Value = "webページの解析に失敗しました")]
+    WebScrapingFailed
 }

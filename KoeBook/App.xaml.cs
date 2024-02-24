@@ -6,6 +6,8 @@ using KoeBook.Core;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Services;
 using KoeBook.Core.Services.Mocks;
+using KoeBook.Epub;
+using KoeBook.Epub.Service;
 using KoeBook.Models;
 using KoeBook.Notifications;
 using KoeBook.Services;
@@ -95,6 +97,8 @@ public partial class App : Application
                 services.AddSingleton<IAnalyzerService, AnalyzerService>();
                 services.AddSingleton<ILlmAnalyzerService, ChatGptAnalyzerService>();
                 services.AddSingleton<OpenAI.Interfaces.IOpenAIService, MyOpenAiService>();
+                // TODO: 切り替えサービスを作成
+                services.AddSingleton<IScrapingService, ScrapingAozora>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();

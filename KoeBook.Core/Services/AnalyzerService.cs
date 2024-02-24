@@ -16,7 +16,16 @@ public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocu
 
     public async ValueTask<BookScripts> AnalyzeAsync(BookProperties bookProperties, string tempDirectory, string coverFilePath, CancellationToken cancellationToken)
     {
-        var document = await _scrapingService.ScrapingAsync(bookProperties.Source, coverFilePath, tempDirectory, bookProperties.Id, cancellationToken);
+        EpubDocument? document;
+        try
+        {
+            document = await _scrapingService.ScrapingAsync(bookProperties.Source, coverFilePath, tempDirectory, bookProperties.Id, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            EbookException.Throw(ExceptionType.WebScrapingFailed, "", ex);
+            return default;
+        }
         _epubDocumentStoreService.Register(document, cancellationToken);
 
         var scriptLines = new List<ScriptLine>();
