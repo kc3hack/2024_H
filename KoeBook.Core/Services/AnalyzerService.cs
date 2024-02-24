@@ -16,7 +16,7 @@ public class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStor
 
     public async ValueTask<BookScripts> AnalyzeAsync(BookProperties bookProperties, string tempDirectory, string coverFilePath, CancellationToken cancellationToken)
     {
-        var document = await _scrapingService.ScrapingAsync(bookProperties.Source, coverFilePath, bookProperties.Id, cancellationToken);
+        var document = await _scrapingService.ScrapingAsync(bookProperties.Source, coverFilePath, tempDirectory, bookProperties.Id, cancellationToken);
         _epubDocumentStoreService.Register(document, cancellationToken);
 
         var scriptLines = new List<ScriptLine>();
