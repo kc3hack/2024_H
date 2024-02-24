@@ -7,7 +7,7 @@ using OpenAI.ObjectModels.RequestModels;
 
 namespace KoeBook.Core.Services;
 
-public partial class ChaGptAnalyzerService(IOpenAIService openAIService) : ILlmAnalyzerService
+public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlmAnalyzerService
 {
     private readonly IOpenAIService _openAiService = openAIService;
 

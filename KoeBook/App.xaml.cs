@@ -92,6 +92,9 @@ public partial class App : Application
                 services.AddSingleton<ISoundGenerationService, SoundGenerationService>();
                 services.AddSingleton<IEpubGenerateService, EpubGenerateService>();
                 services.AddSingleton<IEpubDocumentStoreService, EpubDocumentStoreService>();
+                services.AddSingleton<IAnalyzerService, AnalyzerService>();
+                services.AddSingleton<ILlmAnalyzerService, ChatGptAnalyzerService>();
+                services.AddSingleton<OpenAI.Interfaces.IOpenAIService, MyOpenAiService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();
