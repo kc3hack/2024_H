@@ -5,9 +5,9 @@ using KoeBook.Core.Models.StyleBertVits;
 
 namespace KoeBook.Core.Services;
 
-public class SoundGenerationSelectorService(HttpClient httpClient) : ISoundGenerationSelectorService
+public class SoundGenerationSelectorService(IStyleBertVitsClientService styleBertVitsClientService) : ISoundGenerationSelectorService
 {
-    private readonly HttpClient _httpClient = httpClient;
+    private readonly IStyleBertVitsClientService _styleBertVitsClientService = styleBertVitsClientService;
 
     public IReadOnlyList<SoundModel> Models
     {
@@ -22,20 +22,10 @@ public class SoundGenerationSelectorService(HttpClient httpClient) : ISoundGener
 
     public async ValueTask InitializeAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _httpClient.GetAsync("http://127.0.0.1:5000/models/info", cancellationToken).ConfigureAwait(false)!;
-            if (!response.IsSuccessStatusCode)
-                throw new EbookException(ExceptionType.InitializeFailed);
-            var models = await response.Content.ReadFromJsonAsync<Dictionary<string, ModelInfo>>(cancellationToken)
-                .ConfigureAwait(false) ?? throw new EbookException(ExceptionType.InitializeFailed);
-            _models = models.Select(kvp => new SoundModel(kvp.Key, kvp.Value.FirstSpk, kvp.Value.Styles)).ToArray();
-        }
-        catch (OperationCanceledException) { throw; }
-        catch (EbookException) { throw; }
-        catch (Exception e)
-        {
-            throw new EbookException(ExceptionType.InitializeFailed, innerException: e);
-        }
+        var models = await _styleBertVitsClientService
+            .GetFromJsonAsync<Dictionary<string, ModelInfo>>("/models/info", ExceptionType.InitializeFailed, cancellationToken)
+            .ConfigureAwait(false);
+
+        _models = models.Select(kvp => new SoundModel(kvp.Key, kvp.Value.FirstSpk, kvp.Value.Styles)).ToArray();
     }
 }

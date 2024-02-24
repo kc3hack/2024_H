@@ -3,7 +3,7 @@ using KoeBook.Core.Models;
 
 namespace KoeBook.Core.Services.Mocks;
 
-internal class SoundGenerationSelectorServiceMock : ISoundGenerationSelectorService
+public class SoundGenerationSelectorServiceMock : ISoundGenerationSelectorService
 {
     public IReadOnlyList<SoundModel> Models { get; private set; } = [];
 
@@ -11,12 +11,12 @@ internal class SoundGenerationSelectorServiceMock : ISoundGenerationSelectorServ
     {
         await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
         Models = [
-            new SoundModel("青年1", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
-            new SoundModel("青年2", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
-            new SoundModel("女性1", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
-            new SoundModel("女性2", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
-            new SoundModel("ナレーション (男性)", ["narration"]),
-            new SoundModel("ナレーション (女性)", ["narration"]),
+            new SoundModel("0", "青年1", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
+            new SoundModel("1", "青年2", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
+            new SoundModel("2", "女性1", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
+            new SoundModel("3", "女性2", ["neutral", "laughing", "happy", "sad", "cry", "surprised", "angry"]),
+            new SoundModel("4", "ナレーション (男性)", ["narration"]),
+            new SoundModel("5", "ナレーション (女性)", ["narration"]),
         ];
     }
 }
