@@ -37,4 +37,7 @@ public enum ExceptionType
 
     [EnumMember(Value = "音声生成に失敗しました")]
     SoundGenerationFailed,
+
+    [EnumMember(Value = "有効な Style Bert VITS のAPIルートを設定してください")]
+    UnknownStyleBertVitsRoot,
 }

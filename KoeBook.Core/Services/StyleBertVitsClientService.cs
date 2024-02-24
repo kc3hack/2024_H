@@ -3,9 +3,10 @@ using KoeBook.Core.Contracts.Services;
 
 namespace KoeBook.Core.Services;
 
-public class StyleBertVitsClientService(IHttpClientFactory httpClientFactory) : IStyleBertVitsClientService
+public class StyleBertVitsClientService(IHttpClientFactory httpClientFactory, IApiRootSelectorService apiRootSelectorService) : IStyleBertVitsClientService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly IApiRootSelectorService _apiRootSelectorService = apiRootSelectorService;
 
     public async ValueTask<T> GetFromJsonAsync<T>(string path, ExceptionType exceptionType, CancellationToken cancellationToken)
     {
@@ -24,8 +25,11 @@ public class StyleBertVitsClientService(IHttpClientFactory httpClientFactory) : 
     {
         try
         {
+            var root = _apiRootSelectorService.StyleBertVitsRoot;
+            if (string.IsNullOrEmpty(root))
+                throw new EbookException(ExceptionType.UnknownStyleBertVitsRoot);
             var response = await _httpClientFactory.CreateClient()
-                .GetAsync($"http://127.0.0.1:5000{path}", cancellationToken)
+                .GetAsync($"{root}{path}", cancellationToken)
                 .ConfigureAwait(false) ?? throw new EbookException(exceptionType);
 
             if (!response.IsSuccessStatusCode)

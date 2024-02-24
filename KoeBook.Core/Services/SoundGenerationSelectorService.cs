@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using KoeBook.Core.Contracts.Services;
+﻿using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Models;
 using KoeBook.Core.Models.StyleBertVits;
 
@@ -9,23 +8,18 @@ public class SoundGenerationSelectorService(IStyleBertVitsClientService styleBer
 {
     private readonly IStyleBertVitsClientService _styleBertVitsClientService = styleBertVitsClientService;
 
-    public IReadOnlyList<SoundModel> Models
-    {
-        get
-        {
-            if (_models is null)
-                EbookException.Throw(ExceptionType.DoesNotInitialized);
-            return _models;
-        }
-    }
-    private IReadOnlyList<SoundModel>? _models;
+    public IReadOnlyList<SoundModel> Models { get; private set; } = [];
 
     public async ValueTask InitializeAsync(CancellationToken cancellationToken)
     {
-        var models = await _styleBertVitsClientService
-            .GetFromJsonAsync<Dictionary<string, ModelInfo>>("/models/info", ExceptionType.InitializeFailed, cancellationToken)
-            .ConfigureAwait(false);
+        try
+        {
+            var models = await _styleBertVitsClientService
+                .GetFromJsonAsync<Dictionary<string, ModelInfo>>("/models/info", ExceptionType.InitializeFailed, cancellationToken)
+                .ConfigureAwait(false);
 
-        _models = models.Select(kvp => new SoundModel(kvp.Key, kvp.Value.FirstSpk, kvp.Value.Styles)).ToArray();
+            Models = models.Select(kvp => new SoundModel(kvp.Key, kvp.Value.FirstSpk, kvp.Value.Styles)).ToArray();
+        }
+        catch (EbookException e) when (e.ExceptionType == ExceptionType.UnknownStyleBertVitsRoot) { }
     }
 }

@@ -13,6 +13,7 @@ public class ActivationService : IActivationService
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
+    private readonly IApiRootSelectorService _apiRootSelectorService;
     private readonly ISoundGenerationSelectorService _soundGenerationSelectorService;
     private UIElement? _shell = null;
 
@@ -20,11 +21,13 @@ public class ActivationService : IActivationService
         ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
+        IApiRootSelectorService apiRootSelectorService,
         ISoundGenerationSelectorService soundGenerationSelectorService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
+        _apiRootSelectorService = apiRootSelectorService;
         _soundGenerationSelectorService = soundGenerationSelectorService;
     }
 
@@ -68,6 +71,7 @@ public class ActivationService : IActivationService
     private async Task InitializeAsync()
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+        await _apiRootSelectorService.InitializeAsync(default).ConfigureAwait(false);
         await _soundGenerationSelectorService.InitializeAsync(default).ConfigureAwait(false);
         await Task.CompletedTask;
     }
