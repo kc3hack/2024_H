@@ -4,6 +4,7 @@ using KoeBook.Contracts.Services;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Models;
 using KoeBook.Services;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -27,7 +28,14 @@ public sealed partial class MainViewModel : ObservableRecipient
     [NotifyCanExecuteChangedFor(nameof(StartProcessCommand))]
     private string? _ebookUrl;
 
-    private bool CanExecuteStartProcess => EbookFilePath is not null || !string.IsNullOrEmpty(EbookUrl);
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ErrorTextVisibility))]
+    [NotifyPropertyChangedFor(nameof(CanExecuteStartProcess))]
+    private bool _ebookIsValid = true;
+
+    public Visibility ErrorTextVisibility => EbookIsValid ? Visibility.Collapsed : Visibility.Visible;
+
+    private bool CanExecuteStartProcess => EbookFilePath is not null || !string.IsNullOrEmpty(EbookUrl) && EbookIsValid;
 
     [ObservableProperty]
     private bool _skipEdit = true;
@@ -133,6 +141,30 @@ public sealed partial class MainViewModel : ObservableRecipient
         static async void CoreAsync(ILocalSettingsService settingsService, bool skipEdit)
         {
             await settingsService.SaveSettingAsync(SkipEditSettingsKey, skipEdit);
+        }
+    }
+
+    partial void OnEbookUrlChanged(string? value)
+    {
+        EbookIsValid = IsValid(value);
+
+        static bool IsValid(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return true;
+            ReadOnlySpan<string> allowedOrigins = [
+                "https://www.aozora.gr.jp"
+            ];
+
+            try
+            {
+                var uri = new Uri(value);
+                return allowedOrigins.Contains(uri.GetLeftPart(UriPartial.Authority));
+            }
+            catch (UriFormatException)
+            {
+                return false;
+            }
         }
     }
 }
