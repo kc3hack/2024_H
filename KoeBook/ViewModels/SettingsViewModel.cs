@@ -59,6 +59,7 @@ public partial class SettingsViewModel : ObservableRecipient
         _secretSettingsService = secretSettingsService;
         _apiKey = _secretSettingsService.ApiKey ?? string.Empty;
         _apiRootSelectorService = apiRootSelectorService;
+        _localSettingsService = localSettingsService;
         _styleBertVitsRoot = apiRootSelectorService.StyleBertVitsRoot;
         _soundGenerationSelectorService = soundGenerationSelectorService;
         _versionDescription = GetVersionDescription();
