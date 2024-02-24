@@ -1,4 +1,5 @@
 ﻿using KoeBook.Contracts.Services;
+using KoeBook.Core.Contracts.Services;
 using KoeBook.Helpers;
 
 using Microsoft.UI.Xaml;

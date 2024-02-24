@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace KoeBook.Core;
 
@@ -15,10 +16,28 @@ public class EbookException : Exception
         Message = message;
         ExceptionType = exceptionType;
     }
+
+    [DoesNotReturn]
+    public static void Throw(ExceptionType exceptionType, string? message = null, Exception? innerException = null)
+    {
+        throw new EbookException(exceptionType, message, innerException);
+    }
 }
 
 public enum ExceptionType
 {
     [EnumMember(Value = "Epubの生成に失敗しました")]
-    EpubCreateError
+    EpubCreateError,
+
+    [EnumMember(Value = "初期化に失敗しました")]
+    InitializeFailed,
+
+    [EnumMember(Value = "初期化が未完了です")]
+    DoesNotInitialized,
+
+    [EnumMember(Value = "音声生成に失敗しました")]
+    SoundGenerationFailed,
+
+    [EnumMember(Value = "有効な Style Bert VITS のAPIルートを設定してください")]
+    UnknownStyleBertVitsRoot,
 }

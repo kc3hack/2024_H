@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
+using Microsoft.Extensions.Http;
 
 namespace KoeBook;
 
@@ -61,6 +62,7 @@ public partial class App : Application
                 services.AddSingleton<IAppNotificationService, AppNotificationService>();
                 services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+                services.AddSingleton<IApiRootSelectorService, ApiRootSelectorService>();
                 services.AddTransient<INavigationViewService, NavigationViewService>();
                 services.AddSingleton<ITabViewService, TabViewService>();
 
@@ -73,8 +75,18 @@ public partial class App : Application
                 services.AddSingleton<IDisplayStateChangeService, DisplayStateChangeService>();
 
                 // Core Services
+                services.AddHttpClient()
+                    .ConfigureHttpClientDefaults(builder =>
+                    {
+                        builder.SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                    });
                 services.AddSingleton<IFileService, FileService>();
                 services.AddSingleton<ISecretSettingsService, SecretSettingsService>();
+                services.AddSingleton<IStyleBertVitsClientService, StyleBertVitsClientService>();
+                services.AddSingleton<ISoundGenerationSelectorService, SoundGenerationSelectorService>();
+                services.AddSingleton<ISoundGenerationService, SoundGenerationService>();
+                services.AddSingleton<IEpubGenerateService, EpubGenerateService>();
+                services.AddSingleton<IEpubDocumentStoreService, EpubDocumentStoreService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();

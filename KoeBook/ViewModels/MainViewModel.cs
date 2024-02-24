@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoeBook.Contracts.Services;
+using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Models;
 using KoeBook.Services;
 using Microsoft.UI.Xaml.Controls;
