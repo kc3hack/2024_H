@@ -69,8 +69,6 @@ public sealed partial class EditDetailsViewModel : ObservableObject, IDisposable
             {
                 foreach (var pair in BookScripts.CharacterMapping)
                     pair.Editable = Task.Editable;
-                foreach (var line in BookScripts.ScriptLines)
-                    line.Editable = Task.Editable;
             }
         }
     }
