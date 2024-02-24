@@ -447,7 +447,7 @@ namespace KoeBook.Epub
                 {
                     if (nextNode.NodeType == NodeType.Text)
                     {
-                        if (nextNode.Text() != "\n")
+                        if (!string.IsNullOrWhiteSpace(nextNode.Text()))
                         {
                             previous = true;
 
@@ -522,7 +522,7 @@ namespace KoeBook.Epub
                     {
                         if (node.NodeType == NodeType.Text)
                         {
-                            if (node.Text() != "\n")
+                            if (!string.IsNullOrWhiteSpace(node.Text()))
                             {
                                 text += TextReplace(node.Text());
                             }
@@ -546,14 +546,14 @@ namespace KoeBook.Epub
                         }
                         else
                         {
-                            if ((item.TextContent != "\n") && (!string.IsNullOrEmpty(item.TextContent)))
+                            if (!string.IsNullOrWhiteSpace(item.TextContent) && (!string.IsNullOrEmpty(item.TextContent)))
                             {
                                 text += TextReplace(item.TextContent);
                             }
                         }
                         if (item.NextSibling != null)
                         {
-                            if ((item.NextSibling.TextContent != "\n") && (!string.IsNullOrEmpty(item.NextSibling.TextContent)))
+                            if (!string.IsNullOrWhiteSpace(item.NextSibling.TextContent) && (!string.IsNullOrEmpty(item.NextSibling.TextContent)))
                             {
                                 text += TextReplace(item.NextSibling.Text());
                             }
