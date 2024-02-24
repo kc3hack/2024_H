@@ -9,7 +9,7 @@ public class SecretSettingsService : ISecretSettingsService
 {
     private readonly byte[] _bytes;
 
-    public string? ApiKey { get; private set; } 
+    public string? ApiKey { get; private set; }
 
     public SecretSettingsService()
     {
