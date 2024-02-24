@@ -34,9 +34,9 @@ public class SoundGenerationService(
         }
         catch (OperationCanceledException) { throw; }
         catch (EbookException) { throw; }
-        catch(Exception e) 
+        catch (Exception e)
         {
-           throw new EbookException(ExceptionType.SoundGenerationFailed, innerException: e);
+            throw new EbookException(ExceptionType.SoundGenerationFailed, innerException: e);
         }
     }
 }
