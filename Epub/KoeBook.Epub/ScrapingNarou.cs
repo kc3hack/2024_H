@@ -88,8 +88,8 @@ namespace KoeBook.Epub
                 {
                     Console.WriteLine(i);
                     await Task.Delay(500);
-                    var pageUrl = System.IO.Path.Combine(url,i.ToString());
-                    var load = await ReadPageAsync(pageUrl,isRensai,imageDirectory, ct).ConfigureAwait(false);
+                    var pageUrl = System.IO.Path.Combine(url, i.ToString());
+                    var load = await ReadPageAsync(pageUrl, isRensai, imageDirectory, ct).ConfigureAwait(false);
                     SectionWithChapterTitleList.Add(load);
                 }
                 string? chapterTitle = null;
@@ -141,7 +141,7 @@ namespace KoeBook.Epub
 
         private record SectionWithChapterTitle(string? title, Section section);
 
-        private async Task<SectionWithChapterTitle> ReadPageAsync(string url,bool isRensai, string imageDirectory, CancellationToken ct)
+        private async Task<SectionWithChapterTitle> ReadPageAsync(string url, bool isRensai, string imageDirectory, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
@@ -265,7 +265,7 @@ namespace KoeBook.Epub
                                     foreach (var split in SplitBrace(item.InnerHtml))
                                     {
                                         section.Elements.Add(new Paragraph() { Text = split });
-                                    }   
+                                    }
                                 }
                             }
                             else
