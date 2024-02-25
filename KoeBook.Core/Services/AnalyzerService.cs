@@ -39,21 +39,18 @@ public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocu
                     {
                         var line = paragraph.Text;
                         // rubyタグがあればルビのdictionaryに登録
-                        var matches = MyRegex().Matches(input: line);
-                        foreach (Match match in matches)
+                        var rubyDict = ExtractRuby(line);
+
+                        foreach (var ruby in rubyDict)
                         {
-                            var key = match.Groups[1].Value;
-                            var value = match.Groups[2].Value;
-                            if (!_rubyReplacements.ContainsKey(key))
+                            if (!_rubyReplacements.ContainsKey(ruby.Key))
                             {
-                                _rubyReplacements.Add(key, value);
+                                _rubyReplacements.Add(ruby.Key, ruby.Value);
                             }
                         }
                         // ルビを置換
-                        foreach (var replacement in _rubyReplacements)
-                        {
-                            line = line.Replace(replacement.Key, replacement.Value);
-                        }
+                        line = ReplaceBaseTextWithRuby(line, rubyDict);
+
                         scriptLines.Add(new ScriptLine(paragraph, line, "", ""));
                     }
                 }
@@ -80,6 +77,32 @@ public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocu
         return bookScripts;
     }
 
-    [GeneratedRegex("<ruby>(.*?)<rt>(.*?)</rt></ruby>")]
-    private static partial Regex MyRegex();
+    private static Dictionary<string, string> ExtractRuby(string text)
+    {
+        var rubyDict = new Dictionary<string, string>();
+        var rubyRegex = new Regex("<ruby><rb>(.*?)</rb><rp>（</rp><rt>(.*?)</rt><rp>）</rp></ruby>");
+
+        foreach (Match match in rubyRegex.Matches(text))
+        {
+            if (!rubyDict.ContainsKey(match.Groups[1].Value))
+            {
+                rubyDict.Add(match.Groups[1].Value, match.Groups[2].Value);
+            }
+        }
+
+        return rubyDict;
+    }
+
+    private static string ReplaceBaseTextWithRuby(string text, Dictionary<string, string> rubyDict)
+    {
+        // 元のテキストからルビタグをすべてルビテキストに置き換える
+        var resultText = text;
+        foreach (var pair in rubyDict)
+        {
+            var rubyTag = $"<ruby><rb>{pair.Key}</rb><rp>（</rp><rt>{pair.Value}</rt><rp>）</rp></ruby>";
+            resultText = resultText.Replace(rubyTag, pair.Value);
+        }
+
+        return resultText;
+    }
 }
