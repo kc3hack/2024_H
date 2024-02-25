@@ -286,7 +286,7 @@ namespace KoeBook.Epub
                                     var response = await downloading.Task.ConfigureAwait(false);
                                     using var ms = new MemoryStream();
                                     await response.Content.CopyToAsync(ms, ct).ConfigureAwait(false);
-                                    var filePass = imageDirectory + FileUrlToFileName().Replace(img.Source, "$1");
+                                    var filePass = System.IO.Path.Combine(imageDirectory, FileUrlToFileName().Replace(img.Source, "$1"));
                                     File.WriteAllBytes(filePass, ms.ToArray());
                                     checkSection(document, chapterNum);
                                     if (document.Chapters[chapterNum].Sections[sectionNum].Elements.Count > 1)
