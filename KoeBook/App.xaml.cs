@@ -1,6 +1,8 @@
-﻿using KoeBook.Activation;
+﻿using FastEnumUtility;
+using KoeBook.Activation;
 using KoeBook.Components.Dialog;
 using KoeBook.Contracts.Services;
+using KoeBook.Core;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Services;
 using KoeBook.Core.Services.Mocks;
@@ -14,7 +16,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-using Microsoft.Extensions.Http;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
+using WinRT.Interop;
 
 namespace KoeBook;
 
@@ -122,8 +127,23 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        // TODO: Log and handle exceptions as appropriate.
-        // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+        var hwnd = WindowNative.GetWindowHandle(MainWindow);
+        if (e.Exception is EbookException ebookException)
+        {
+            PInvoke.MessageBox((HWND)hwnd,
+                $"ラーが発生しました。KoeBookを終了します。\n{ebookException.ExceptionType.GetEnumMemberValue()}",
+                "KoeBookからのお知らせ",
+                MESSAGEBOX_STYLE.MB_OK | MESSAGEBOX_STYLE.MB_ICONWARNING);
+        }
+        else
+        {
+            PInvoke.MessageBox((HWND)hwnd,
+                $"不明なエラーが発生しました。KoeBookを終了します。\n{e.Exception.Message}\n\n{e.Exception.StackTrace}",
+                "KoeBookからのお知らせ",
+                MESSAGEBOX_STYLE.MB_OK | MESSAGEBOX_STYLE.MB_ICONWARNING);
+        }
+        e.Handled = true;
+        Current.Exit();
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
