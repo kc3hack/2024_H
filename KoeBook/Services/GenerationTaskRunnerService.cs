@@ -62,7 +62,7 @@ public class GenerationTaskRunnerService
                 task.Progress = 1;
                 task.MaximumProgress = 1;
                 var fileName = Path.GetFileName(resultPath);
-                File.Copy(resultPath, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"KoeBook", fileName), true);
+                File.Copy(resultPath, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "KoeBook", fileName), true);
             }
         }
         catch (OperationCanceledException)
