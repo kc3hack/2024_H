@@ -54,15 +54,15 @@
                     </StackPanel>-->
 
                     <StackPanel>
-                        <TextBlock Text="Webページを読み上げる (青空文庫のみ対応)"/>
+                        <TextBlock Text="Webページを読み上げる (青空文庫または小説家になろうに対応)"/>
                         <TextBox
                             Text="{x:Bind ViewModel.EbookUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             BeforeTextChanging="{x:Bind ViewModel.BeforeTextChanging}"
                             Margin="{StaticResource XSmallTopMargin}"
-                            PlaceholderText="https://www.aozora.gr.jp/cards/000035/files/1567_14913.html"/>
+                            PlaceholderText="https://www.aozora.gr.jp"/>
                         <TextBlock
                             Visibility="{x:Bind ViewModel.ErrorTextVisibility, Mode=OneWay}"
-                            Text="青空文庫のURLを入力してください"
+                            Text="青空文庫または小説家になろうのURLを入力してください"
                             Style="{ThemeResource CaptionTextBlockStyle}"
                             Foreground="{ThemeResource SystemErrorTextColor}"/>
                     </StackPanel>
