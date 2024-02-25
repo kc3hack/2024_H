@@ -16,6 +16,11 @@ public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocu
 
     public async ValueTask<BookScripts> AnalyzeAsync(BookProperties bookProperties, string tempDirectory, string coverFilePath, CancellationToken cancellationToken)
     {
+        coverFilePath = Path.Combine(tempDirectory, "Cover.png");
+        using var fs = File.Create(coverFilePath);
+        await fs.WriteAsync(CoverFile.ToArray(), cancellationToken);
+        await fs.FlushAsync(cancellationToken);
+
         EpubDocument? document;
         try
         {
