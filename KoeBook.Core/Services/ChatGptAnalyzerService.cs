@@ -1,37 +1,51 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using KoeBook.Core.Contracts.Services;
+using KoeBook.Core.Helpers;
 using KoeBook.Core.Models;
 using OpenAI.Interfaces;
 using OpenAI.ObjectModels.RequestModels;
 
 namespace KoeBook.Core.Services;
 
-public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlmAnalyzerService
+public partial class ChatGptAnalyzerService(IOpenAIService openAIService, IDisplayStateChangeService displayStateChangeService) : ILlmAnalyzerService
 {
     private readonly IOpenAIService _openAiService = openAIService;
+    private readonly IDisplayStateChangeService _displayStateChangeService = displayStateChangeService;
 
     public async ValueTask<BookScripts> LlmAnalyzeScriptLinesAsync(BookProperties bookProperties, List<ScriptLine> scriptLines, List<string> chunks, CancellationToken cancellationToken)
     {
+        var progress = _displayStateChangeService.ResetProgress(bookProperties, GenerationState.Analyzing, chunks.Count);
         Queue<string> summaryList = new();
         Queue<string> characterList = new();
+        int currentLineIndex = 0;
         for (int i = 0; i < chunks.Count; i++)
         {
             // 話者・スタイル解析
-            var Task1 = CharacterStyleAnalysisAsync(scriptLines, chunks, summaryList.Peek(), characterList.Peek(), i, cancellationToken);
+            var summary = "";
+            var characters = "";
+            if (summaryList.Count != 0)
+            {
+                summary = summaryList.Peek();
+                characters = characterList.Peek();
+            }
+            var Task1 = CharacterStyleAnalysisAsync(scriptLines, chunks, summary, characters, i, currentLineIndex, cancellationToken);
             // 要約・キャラクターリスト解析
-            var Task2 = SummaryCharacterListAnalysisAsync(scriptLines, chunks, summaryList.Peek(), characterList.Peek(), i, cancellationToken);
+            var summary1 = "";
+            var characters1 = "";
+            if (summaryList.Count > 5)
+            {
+                summary1 = summaryList.Dequeue();
+                characters1 = characterList.Dequeue();
+            }
+            var Task2 = SummaryCharacterListAnalysisAsync(scriptLines, chunks, summary1, characters1, i, cancellationToken);
             // WhenAllで非同期処理を待つ
             await Task.WhenAll(Task1, Task2);
+            currentLineIndex += chunks[i].Split("\n").Length - 1;
             // 結果をキューに追加
             summaryList.Enqueue(Task2.Result.summary);
             characterList.Enqueue(Task2.Result.characterList);
-            // 5個以上になったら古いものを削除
-            if (summaryList.Count > 5)
-            {
-                summaryList.Dequeue();
-                characterList.Dequeue();
-            }
+            progress.UpdateProgress(i + 1);
         }
 
         // キャラクター名と声のマッピング
@@ -56,8 +70,11 @@ public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlm
                                                    string summary,
                                                    string characterList,
                                                    int idx,
+                                                   int currentLineIndex,
                                                    CancellationToken cancellationToken)
     {
+        int count = 0;
+RESTART:
         var completionResult = await _openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
         {
             Messages = new List<ChatMessage>
@@ -109,52 +126,27 @@ public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlm
                     ```
                     STYLE = narration | neutral | laughing | happy | sad | cry | surprised | angry
                     assign the name of the speaker to {TALKER} if the sentence is dialogue, or use 'ナレーション' for narrative sentences. If the sentence is part of a monologue, use the name of the character who is speaking.
-                    The {SENTENCE} should be a direct excerpt from the 'Target Sentence' section."
+                    {SENTENCE} should be used as is from the first line of the "Target Sentence" section, without a line break.
 
 
                     # **Notes**
                     ## **Separate Narration and lines.** Be careful as you often make mistakes!!
                     Input
                     ```
-                    落ちてくる落ち葉を見て、清美は言った。
+                    そうして、時が流れ少し肌寒い季節となった。木もすっかりやせ細っていて、黄金色の葉っぱが雪のように降っている。落ちてくる落ち葉を見て、清美は言った。
                     「悲しいね…。あなたとの思い出が、一枚一枚、地面に落ちていくみたい…。」
                     ```
                     Output
                     ```
-                    落ちてくる落ち葉を見て、清美は言った。[ナレーション:narration]
+                    そうして、時が流れ少し肌寒い季節となった。木もすっかりやせ細っていて、黄金色の葉っぱが雪のように降っている。落ちてくる落ち葉を見て、清美は言った。[ナレーション:narration]
                     「悲しいね…。あなたとの思い出が、一枚一枚、地面に落ちていくみたい…。」[漆原清美:sad]
                     ```
-                    ## First person
-                    Input
-                    ```
-                    俺は泣きながら勇気を振り絞って言った。
-                    「お前は本当に、俺のことを愛してるのか？」
-                    ```
-                    Output
-                    ```
-                    俺は泣きながら勇気を振り絞って言った。[松原一馬:narration]
-                    「お前は本当に、俺のことを愛してるのか？」[松原一馬:cry]
-                    ```
-                    ## What is not enclosed in brackets is basically narration style
-                    Input
-                    ```
-                    ファーラン王子はそっと、王のもとへ行き、王の耳元で何かを囁いた。
-                    そして、王は、その言葉を聞いて、驚いたような顔をした。
-                    アミダス王は立ち上がり、民衆の前で声を張り上げた。
-                    「私は、この国を、息子ファーランに譲る！」
-                    ```
-                    Output
-                    ```
-                    ファーラン王子はそっと、王のもとへ行き、王の耳元で何かを囁いた。[ナレーション:narration]
-                    そして、王は、その言葉を聞いて、驚いたような顔をした。[ナレーション:narration]
-                    アミダス王は立ち上がり、民衆の前で声を張り上げた。[ナレーション:narration]
-                    「私は、この国を、息子ファーランに譲る！」[アミダス王:neutral]
                     ```
                     """
                     )
             },
-            Model = OpenAI.ObjectModels.Models.Gpt_4_0125_preview,
-            MaxTokens = 2000
+            Model = OpenAI.ObjectModels.Models.Gpt_4_turbo_preview,
+            MaxTokens = 4000
         });
         if (completionResult.Successful)
         {
@@ -189,19 +181,20 @@ public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlm
                     var sentence = match.Groups[1].Value;
                     var talker = match.Groups[2].Value;
                     var style = match.Groups[3].Value;
-                    if (sentence == scriptLines[idx + i].Text || Math.Abs(sentence.Length - scriptLines[idx + i].Text.Length) < 5)
+                    if (sentence == scriptLines[currentLineIndex + i].Text || Math.Abs(sentence.Length - scriptLines[currentLineIndex + i].Text.Length) < 5)
                     {
-                        scriptLines[idx + i].Character = talker;
-                        scriptLines[idx + i].Style = style;
+                        scriptLines[currentLineIndex + i].Character = talker;
+                        scriptLines[currentLineIndex + i].Style = style;
                     }
-                    else
+                    else if (count > 3)
                     {
                         EbookException.Throw(ExceptionType.Gpt4TalkerAndStyleSettingFailed);
                     }
-                }
-                else
-                {
-                    EbookException.Throw(ExceptionType.Gpt4TalkerAndStyleSettingFailed);
+                    else
+                    {
+                        count++;
+                        goto RESTART;
+                    }
                 }
             }
         }
@@ -259,15 +252,15 @@ public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlm
                     ...
 
 
-                    #### Summery of 5 points
+                    #### Summery of {{Math.Min(20,(idx+1)*5)}} points
                     - {summary1}
                     - {summary2}
                     ...
                     ```
                     """),
             },
-            Model = OpenAI.ObjectModels.Models.Gpt_4_0125_preview,
-            MaxTokens = 2000
+            Model = OpenAI.ObjectModels.Models.Gpt_4_turbo_preview,
+            MaxTokens = 4000
         });
         if (completionResult.Successful)
         {
@@ -361,8 +354,8 @@ public partial class ChatGptAnalyzerService(IOpenAIService openAIService) : ILlm
                 ```
                 """)
             },
-            Model = OpenAI.ObjectModels.Models.Gpt_4_0125_preview,
-            MaxTokens = 2000
+            Model = OpenAI.ObjectModels.Models.Gpt_4_turbo_preview,
+            MaxTokens = 4000
         });
         if (completionResult.Successful)
         {

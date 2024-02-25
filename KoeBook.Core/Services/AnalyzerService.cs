@@ -67,7 +67,7 @@ public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocu
                 chunks.Add(chunk.ToString());
                 chunk.Clear();
             }
-            chunk.Append(line.Text);
+            chunk.AppendLine(line.Text);
         }
         if (chunk.Length > 0) chunks.Add(chunk.ToString());
 
