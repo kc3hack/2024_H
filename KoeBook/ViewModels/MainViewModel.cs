@@ -153,7 +153,8 @@ public sealed partial class MainViewModel : ObservableRecipient
             if (string.IsNullOrEmpty(value))
                 return true;
             ReadOnlySpan<string> allowedOrigins = [
-                "https://www.aozora.gr.jp"
+                "https://www.aozora.gr.jp",
+                "https://syosetu.com",
             ];
 
             try
