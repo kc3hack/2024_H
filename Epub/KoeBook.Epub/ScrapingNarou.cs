@@ -80,38 +80,105 @@ namespace KoeBook.Epub
                 throw new EpubDocumentException("Url may be not Correct");
             }
 
+            var document = new EpubDocument(bookTitle.InnerHtml, bookAuther.InnerHtml, coverFilePath, id);
             if (isRensai)
             {
-                //ReadPageAsync(url, imageDirectory, ct);
-                var temp = ReadPageAsync("https://ncode.syosetu.com/n1443bp/2/", imageDirectory, ct);
-                Console.WriteLine(temp.Result.Elements.Count);
+                List<SectionWithChapterTitle> SectionWithChapterTitleList = new List<SectionWithChapterTitle>();
+                for (int i = 1; i <= allNum; i++)
+                {
+                    Console.WriteLine(i);
+                    await Task.Delay(500);
+                    var pageUrl = System.IO.Path.Combine(url,i.ToString());
+                    var load = await ReadPageAsync(pageUrl,isRensai,imageDirectory, ct).ConfigureAwait(false);
+                    SectionWithChapterTitleList.Add(load);
+                }
+                string? chapterTitle = null;
+                foreach (var sectionWithChapterTitle in SectionWithChapterTitleList)
+                {
+                    if (sectionWithChapterTitle != null)
+                    {
+                        if (sectionWithChapterTitle.title != null)
+                        {
+                            if (sectionWithChapterTitle.title != chapterTitle)
+                            {
+                                chapterTitle = sectionWithChapterTitle.title;
+                                document.Chapters.Add(new Chapter() { Title = chapterTitle });
+                                document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
+                            }
+                            else
+                            {
+                                document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
+                            }
+                        }
+                        else
+                        {
+                            if (document.Chapters.Count == 0)
+                            {
+                                document.Chapters.Add(new Chapter());
+                            }
+                            document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
+                        }
+                    }
+                    else
+                    {
+                        throw new EpubDocumentException("failed to get page");
+                    }
+                }
             }
             else
             {
-                ReadPageAsync(url, imageDirectory, ct);
+                var load = await ReadPageAsync(url, isRensai, imageDirectory, ct).ConfigureAwait(false);
+                if (load != null)
+                {
+                    document.Chapters.Add(new Chapter() { Title = null });
+                    document.Chapters[^1].Sections.Add(load.section);
+                }
             }
-
-            return new EpubDocument("", "", "", id);
-
+            return document;
         }
 
         public record BookInfo(int? allcount, int? noveltype, int? general_all_no);
 
-        private async  Task<Section> ReadPageAsync(string url, string imageDirectory, CancellationToken ct)
+        private record SectionWithChapterTitle(string? title, Section section);
+
+        private async Task<SectionWithChapterTitle> ReadPageAsync(string url,bool isRensai, string imageDirectory, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
 
-            var chapterTitle = doc.QuerySelector(".chapter_title");
+            var chapterTitleElement = doc.QuerySelector(".chapter_title");
+            string? chapterTitle = null;
+            if (chapterTitleElement != null)
+            {
+                if (chapterTitleElement.InnerHtml != null)
+                {
+                    chapterTitle = chapterTitleElement.InnerHtml;
+                }
+            }
 
-            var sectionTitle = doc.QuerySelector(".novel_subtitle");
-            if (sectionTitle == null)
+            IElement? sectionTitleElement = null;
+            if (isRensai)
+            {
+                sectionTitleElement = doc.QuerySelector(".novel_subtitle");
+            }
+            else
+            {
+                sectionTitleElement = doc.QuerySelector(".novel_title");
+            }
+
+            string sectionTitle = "";
+            if (sectionTitleElement == null)
             {
                 throw new EpubDocumentException("Can not find title of page");
             }
+            else
+            {
+                sectionTitle = sectionTitleElement.InnerHtml;
+            }
 
-            var section = new Section(sectionTitle.InnerHtml);
+
+            var section = new Section(sectionTitleElement.InnerHtml);
 
 
             var main_text = doc.QuerySelector("#novel_honbun");
@@ -147,10 +214,9 @@ namespace KoeBook.Epub
                                                 var response = await downloading.Task.ConfigureAwait(false);
                                                 using var ms = new MemoryStream();
                                                 await response.Content.CopyToAsync(ms, ct).ConfigureAwait(false);
-                                                var filePass = imageDirectory + FileUrlToFileName().Replace(img.Source, "$1");
-                                                
+                                                var filePass = System.IO.Path.Combine(imageDirectory, FileUrlToFileName().Replace(response.Address.Href, "$1"));
                                                 File.WriteAllBytes(filePass, ms.ToArray());
-
+                                                section.Elements.Add(new Picture(filePass));
                                             }
                                         }
                                         else
@@ -164,14 +230,39 @@ namespace KoeBook.Epub
                                     throw new EpubDocumentException("Unexpected structure");
                                 }
                             }
-                            else
+                            else if (item.Children[0].TagName == "RUBY")
                             {
-
+                                if (!string.IsNullOrWhiteSpace(item.InnerHtml))
+                                {
+                                    section.Elements.Add(new Paragraph() { Text = item.InnerHtml });
+                                }
+                            }
+                            else if (item.Children[0] is not IHtmlBreakRowElement)
+                            {
+                                throw new EpubDocumentException("Unexpected structure");
                             }
                         }
                         else
                         {
-                            throw new EpubDocumentException("Unexpected structure");
+                            bool isAllRuby = true;
+                            foreach (var tags in item.Children)
+                            {
+                                if (tags.TagName != "RUBY")
+                                {
+                                    isAllRuby = false;
+                                }
+                            }
+                            if (isAllRuby)
+                            {
+                                if (!string.IsNullOrWhiteSpace(item.InnerHtml))
+                                {
+                                    section.Elements.Add(new Paragraph() { Text = item.InnerHtml });
+                                }
+                            }
+                            else
+                            {
+                                throw new EpubDocumentException("Unexpected structure");
+                            }
                         }
                     }
                     else
@@ -184,10 +275,10 @@ namespace KoeBook.Epub
             {
                 throw new EpubDocumentException("There is no honbun.");
             }
-            return section;
+            return new SectionWithChapterTitle(chapterTitle, section);
         }
 
-        
+
 
         [System.Text.RegularExpressions.GeneratedRegex(@"https://.{5,7}.syosetu.com/(.{7}).?")]
         private static partial System.Text.RegularExpressions.Regex UrlToNcode();
