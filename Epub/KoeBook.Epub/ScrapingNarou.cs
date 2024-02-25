@@ -192,7 +192,10 @@ namespace KoeBook.Epub
                         {
                             if (!string.IsNullOrWhiteSpace(item.InnerHtml))
                             {
-                                section.Elements.Add(new Paragraph() { Text = item.InnerHtml });
+                                foreach (var split in SplitBrace(item.InnerHtml))
+                                {
+                                    section.Elements.Add(new Paragraph() { Text = split });
+                                }
                             }
                         }
                         else if (item.ChildElementCount == 1)
@@ -234,7 +237,10 @@ namespace KoeBook.Epub
                             {
                                 if (!string.IsNullOrWhiteSpace(item.InnerHtml))
                                 {
-                                    section.Elements.Add(new Paragraph() { Text = item.InnerHtml });
+                                    foreach (var split in SplitBrace(item.InnerHtml))
+                                    {
+                                        section.Elements.Add(new Paragraph() { Text = split });
+                                    }
                                 }
                             }
                             else if (item.Children[0] is not IHtmlBreakRowElement)
@@ -256,7 +262,10 @@ namespace KoeBook.Epub
                             {
                                 if (!string.IsNullOrWhiteSpace(item.InnerHtml))
                                 {
-                                    section.Elements.Add(new Paragraph() { Text = item.InnerHtml });
+                                    foreach (var split in SplitBrace(item.InnerHtml))
+                                    {
+                                        section.Elements.Add(new Paragraph() { Text = split });
+                                    }   
                                 }
                             }
                             else
