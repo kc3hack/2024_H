@@ -14,6 +14,7 @@ public class ActivationService : IActivationService
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IApiRootSelectorService _apiRootSelectorService;
+    private readonly ISecretSettingsService _secretSettingsService;
     private readonly ISoundGenerationSelectorService _soundGenerationSelectorService;
     private UIElement? _shell = null;
 
@@ -22,12 +23,14 @@ public class ActivationService : IActivationService
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         IApiRootSelectorService apiRootSelectorService,
+        ISecretSettingsService secretSettingsService,
         ISoundGenerationSelectorService soundGenerationSelectorService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _apiRootSelectorService = apiRootSelectorService;
+        _secretSettingsService = secretSettingsService;
         _soundGenerationSelectorService = soundGenerationSelectorService;
     }
 
@@ -72,6 +75,7 @@ public class ActivationService : IActivationService
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _apiRootSelectorService.InitializeAsync(default).ConfigureAwait(false);
+        await _secretSettingsService.InitializeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "KoeBook/ApplicationData"), default).ConfigureAwait(false);
         await _soundGenerationSelectorService.InitializeAsync(default).ConfigureAwait(false);
         await Task.CompletedTask;
     }

@@ -9,6 +9,8 @@ public class SecretSettingsService : ISecretSettingsService
 {
     private readonly byte[] _bytes;
 
+    public string? ApiKey { get; private set; }
+
     public SecretSettingsService()
     {
         ulong value = 2546729043367843253ul;
@@ -18,9 +20,9 @@ public class SecretSettingsService : ISecretSettingsService
         _bytes = BitConverter.GetBytes(value);
     }
 
-    public Task<string?> GetApiKeyAsync(string folderPath, CancellationToken cancellationToken)
+    public async Task<string?> InitializeAsync(string folderPath, CancellationToken cancellationToken)
     {
-        return Task.Run(async () =>
+        ApiKey = await Task.Run(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             var path = Path.Combine(folderPath, "alt");
@@ -32,12 +34,14 @@ public class SecretSettingsService : ISecretSettingsService
 
             var result = ProtectedData.Unprotect(data, _bytes, DataProtectionScope.CurrentUser);
             return Encoding.UTF8.GetString(result);
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
+        return ApiKey;
     }
 
     public Task SaveApiKeyAsync(string folderPath, string apiKey, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(apiKey);
+        ApiKey = apiKey;
         return Task.Run(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();

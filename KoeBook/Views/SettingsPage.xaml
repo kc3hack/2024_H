@@ -7,8 +7,7 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:helpers="using:KoeBook.Helpers"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    mc:Ignorable="d"
-    Loaded="{x:Bind ViewModel.OnLoaded}">
+    mc:Ignorable="d">
     <Page.Resources>
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>

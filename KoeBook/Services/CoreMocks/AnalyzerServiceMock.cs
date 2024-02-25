@@ -10,7 +10,7 @@ public class AnalyzerServiceMock(IDisplayStateChangeService stateService) : IAna
 {
     private readonly IDisplayStateChangeService _stateService = stateService;
 
-    public async ValueTask<BookScripts> AnalyzeAsync(BookProperties bookProperties, CancellationToken cancellationToken)
+    public async ValueTask<BookScripts> AnalyzeAsync(BookProperties bookProperties, string tempDirectory, string coverFilePath, CancellationToken cancellationToken)
     {
         DisplayStateChanging stateChanging;
         if (bookProperties.SourceType == SourceType.Url)

@@ -50,7 +50,7 @@ public class GenerationTaskRunnerService
     {
         try
         {
-            var scripts = await _analyzerService.AnalyzeAsync(new(task.Id, task.Source, task.SourceType), task.CancellationToken);
+            var scripts = await _analyzerService.AnalyzeAsync(new(task.Id, task.Source, task.SourceType), _tempFolder, "", task.CancellationToken);
             task.BookScripts = scripts;
             task.State = GenerationState.Editting;
             task.Progress = 0;
@@ -59,8 +59,10 @@ public class GenerationTaskRunnerService
             {
                 var resultPath = await _epubGenService.GenerateEpubAsync(scripts, _tempFolder, task.CancellationToken);
                 task.State = GenerationState.Completed;
-                task.Progress = 0;
-                task.MaximumProgress = 0;
+                task.Progress = 1;
+                task.MaximumProgress = 1;
+                var fileName = Path.GetFileName(resultPath);
+                File.Copy(resultPath, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "KoeBook", fileName), true);
             }
         }
         catch (OperationCanceledException)
@@ -88,6 +90,8 @@ public class GenerationTaskRunnerService
             task.State = GenerationState.Completed;
             task.Progress = 1;
             task.MaximumProgress = 1;
+            var fileName = Path.GetFileName(resultPath);
+            File.Copy(resultPath, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "KoeBook", fileName), true);
         }
         catch (OperationCanceledException)
         {
