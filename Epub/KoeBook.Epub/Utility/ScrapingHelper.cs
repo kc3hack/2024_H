@@ -1,36 +1,7 @@
-﻿using KoeBook.Epub.Models;
-
-namespace KoeBook.Epub.Utility;
+﻿namespace KoeBook.Epub.Utility;
 
 public static class ScrapingHelper
 {
-    internal static void EnsureChapter(EpubDocument document)
-    {
-        if (document.Chapters.Count == 0)
-            document.Chapters.Add(new Chapter() { Title = null });
-    }
-
-    internal static void EnsureSection(EpubDocument document, int chapterIndex)
-    {
-        EnsureChapter(document);
-
-        if (document.Chapters[chapterIndex].Sections.Count == 0)
-        {
-            if (document.Chapters[chapterIndex].Title != null)
-                document.Chapters[chapterIndex].Sections.Add(new Section(document.Chapters[chapterIndex].Title!));
-            else
-                document.Chapters[chapterIndex].Sections.Add(new Section(document.Title));
-        }
-    }
-
-    internal static void EnsureParagraph(EpubDocument document, int chapterIndex, int sectionIndex)
-    {
-        EnsureSection(document, chapterIndex);
-
-        if (document.Chapters[chapterIndex].Sections[sectionIndex].Elements.Count == 0)
-            document.Chapters[chapterIndex].Sections[sectionIndex].Elements.Add(new Paragraph());
-    }
-
     public static List<string> SplitBrace(string text)
     {
         if (text.Length == 1 && text != "「" && text != "」")
