@@ -1,11 +1,10 @@
-﻿using AngleSharp;
+﻿using System.Net.Http.Json;
+using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
-using System.IO;
-using System.Net.Http.Json;
 using static KoeBook.Epub.ScrapingHelper;
 
 namespace KoeBook.Epub.Services
@@ -26,19 +25,12 @@ namespace KoeBook.Epub.Services
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
 
             // title の取得
-            var bookTitle = doc.QuerySelector(".novel_title");
-            if (bookTitle is null)
-            {
-                throw new EpubDocumentException($"Failed to get title properly.\nUrl may be not collect");
-            }
+            var bookTitle = doc.QuerySelector(".novel_title")
+                ?? throw new EpubDocumentException($"Failed to get title properly.\nUrl may be not collect");
 
             // auther の取得
-            var bookAuther = doc.QuerySelector(".novel_writername a");
-            if (bookAuther is null)
-            {
-                throw new EpubDocumentException($"Failed to get auther properly.\nUrl may be not collect");
-            }
-
+            var bookAuther = doc.QuerySelector(".novel_writername a")
+                ?? throw new EpubDocumentException($"Failed to get auther properly.\nUrl may be not collect");
             bool isRensai = true;
             int allNum = 0;
 
@@ -50,35 +42,27 @@ namespace KoeBook.Epub.Services
             var client = _httpCliantFactory.CreateClient();
             var result = await client.SendAsync(message, ct).ConfigureAwait(false);
             var test = await result.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-            if (result.IsSuccessStatusCode)
-            {
-                var content = await result.Content.ReadFromJsonAsync<BookInfo[]>(ct).ConfigureAwait(false);
-                if (content != null)
-                {
-                    if (content[1].noveltype != null)
-                    {
-                        if (content[1].noveltype == 2)
-                        {
-                            isRensai = false;
-                        }
-                    }
-                    else
-                    {
-                        throw new EpubDocumentException("faild to get data by Narou API");
-                    }
-                    if (content[1].general_all_no != null)
-                    {
-                        allNum = (int)content[1].general_all_no!;
-                    }
-                    if (allNum == 0)
-                    {
-                        throw new EpubDocumentException("faild to get data by Narou API");
-                    }
-                }
-            }
-            else
-            {
+            if (!result.IsSuccessStatusCode)
                 throw new EpubDocumentException("Url may be not Correct");
+
+            var content = await result.Content.ReadFromJsonAsync<BookInfo[]>(ct).ConfigureAwait(false);
+            if (content != null)
+            {
+                if (content[1].noveltype == null)
+                    throw new EpubDocumentException("faild to get data by Narou API");
+
+                if (content[1].noveltype == 2)
+                {
+                    isRensai = false;
+                }
+
+                if (content[1].general_all_no != null)
+                {
+                    allNum = (int)content[1].general_all_no!;
+                }
+
+                if (allNum == 0)
+                    throw new EpubDocumentException("faild to get data by Narou API");
             }
 
             var document = new EpubDocument(bookTitle.InnerHtml, bookAuther.InnerHtml, coverFilePath, id);
@@ -89,40 +73,36 @@ namespace KoeBook.Epub.Services
                 {
                     Console.WriteLine(i);
                     await Task.Delay(500, ct);
-                    var pageUrl = System.IO.Path.Combine(url, i.ToString());
+                    var pageUrl = Path.Combine(url, i.ToString());
                     var load = await ReadPageAsync(pageUrl, isRensai, imageDirectory, ct).ConfigureAwait(false);
                     SectionWithChapterTitleList.Add(load);
                 }
                 string? chapterTitle = null;
                 foreach (var sectionWithChapterTitle in SectionWithChapterTitleList)
                 {
-                    if (sectionWithChapterTitle != null)
+                    if (sectionWithChapterTitle == null)
+                        throw new EpubDocumentException("failed to get page");
+
+                    if (sectionWithChapterTitle.title != null)
                     {
-                        if (sectionWithChapterTitle.title != null)
+                        if (sectionWithChapterTitle.title != chapterTitle)
                         {
-                            if (sectionWithChapterTitle.title != chapterTitle)
-                            {
-                                chapterTitle = sectionWithChapterTitle.title;
-                                document.Chapters.Add(new Chapter() { Title = chapterTitle });
-                                document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
-                            }
-                            else
-                            {
-                                document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
-                            }
+                            chapterTitle = sectionWithChapterTitle.title;
+                            document.Chapters.Add(new Chapter() { Title = chapterTitle });
+                            document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
                         }
                         else
                         {
-                            if (document.Chapters.Count == 0)
-                            {
-                                document.Chapters.Add(new Chapter());
-                            }
                             document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
                         }
                     }
                     else
                     {
-                        throw new EpubDocumentException("failed to get page");
+                        if (document.Chapters.Count == 0)
+                        {
+                            document.Chapters.Add(new Chapter());
+                        }
+                        document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
                     }
                 }
             }
@@ -170,120 +150,93 @@ namespace KoeBook.Epub.Services
 
             string sectionTitle = "";
             if (sectionTitleElement == null)
-            {
                 throw new EpubDocumentException("Can not find title of page");
-            }
-            else
-            {
-                sectionTitle = sectionTitleElement.InnerHtml;
-            }
 
+            sectionTitle = sectionTitleElement.InnerHtml;
 
             var section = new Section(sectionTitleElement.InnerHtml);
 
 
-            var main_text = doc.QuerySelector("#novel_honbun");
-            if (main_text != null)
+            var main_text = doc.QuerySelector("#novel_honbun")
+                ?? throw new EpubDocumentException("There is no honbun.");
+
+            foreach (var item in main_text.Children)
             {
-                foreach (var item in main_text.Children)
+                if (item is not IHtmlParagraphElement)
+                    throw new EpubDocumentException("Unexpected structure");
+
+                if (item.ChildElementCount == 0)
                 {
-                    if (item is IHtmlParagraphElement)
+                    if (!string.IsNullOrWhiteSpace(item.InnerHtml))
                     {
-                        if (item.ChildElementCount == 0)
+                        foreach (var split in SplitBrace(item.InnerHtml))
                         {
-                            if (!string.IsNullOrWhiteSpace(item.InnerHtml))
-                            {
-                                foreach (var split in SplitBrace(item.InnerHtml))
-                                {
-                                    section.Elements.Add(new Paragraph() { Text = split });
-                                }
-                            }
+                            section.Elements.Add(new Paragraph() { Text = split });
                         }
-                        else if (item.ChildElementCount == 1)
-                        {
-                            if (item.Children[0] is IHtmlAnchorElement aElement)
-                            {
-                                if (aElement.ChildElementCount == 1)
-                                {
-                                    if (aElement.Children[0] is IHtmlImageElement img)
-                                    {
-                                        if (img.Source != null)
-                                        {
-                                            // 画像のダウンロード
-                                            var loader = context.GetService<IDocumentLoader>();
-                                            if (loader != null)
-                                            {
-                                                var downloading = loader.FetchAsync(new DocumentRequest(new Url(img.Source)));
-                                                ct.Register(() => downloading.Cancel());
-                                                var response = await downloading.Task.ConfigureAwait(false);
-                                                using var ms = new MemoryStream();
-                                                await response.Content.CopyToAsync(ms, ct).ConfigureAwait(false);
-                                                var filePass = System.IO.Path.Combine(imageDirectory, FileUrlToFileName().Replace(response.Address.Href, "$1"));
-                                                File.WriteAllBytes(filePass, ms.ToArray());
-                                                section.Elements.Add(new Picture(filePass));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            throw new EpubDocumentException("Unexpected structure");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    throw new EpubDocumentException("Unexpected structure");
-                                }
-                            }
-                            else if (item.Children[0].TagName == "RUBY")
-                            {
-                                if (!string.IsNullOrWhiteSpace(item.InnerHtml))
-                                {
-                                    foreach (var split in SplitBrace(item.InnerHtml))
-                                    {
-                                        section.Elements.Add(new Paragraph() { Text = split });
-                                    }
-                                }
-                            }
-                            else if (item.Children[0] is not IHtmlBreakRowElement)
-                            {
-                                throw new EpubDocumentException("Unexpected structure");
-                            }
-                        }
-                        else
-                        {
-                            bool isAllRuby = true;
-                            foreach (var tags in item.Children)
-                            {
-                                if (tags.TagName != "RUBY")
-                                {
-                                    isAllRuby = false;
-                                }
-                            }
-                            if (isAllRuby)
-                            {
-                                if (!string.IsNullOrWhiteSpace(item.InnerHtml))
-                                {
-                                    foreach (var split in SplitBrace(item.InnerHtml))
-                                    {
-                                        section.Elements.Add(new Paragraph() { Text = split });
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                throw new EpubDocumentException("Unexpected structure");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new EpubDocumentException("Unexpected structure");
                     }
                 }
-            }
-            else
-            {
-                throw new EpubDocumentException("There is no honbun.");
+                else if (item.ChildElementCount == 1)
+                {
+                    if (item.Children[0] is IHtmlAnchorElement aElement)
+                    {
+                        if (aElement.ChildElementCount != 1)
+                            throw new EpubDocumentException("Unexpected structure");
+
+                        if (aElement.Children[0] is IHtmlImageElement img)
+                        {
+                            if (img.Source == null)
+                                throw new EpubDocumentException("Unexpected structure");
+
+                            // 画像のダウンロード
+                            var loader = context.GetService<IDocumentLoader>();
+                            if (loader != null)
+                            {
+                                var downloading = loader.FetchAsync(new DocumentRequest(new Url(img.Source)));
+                                ct.Register(() => downloading.Cancel());
+                                var response = await downloading.Task.ConfigureAwait(false);
+                                using var ms = new MemoryStream();
+                                await response.Content.CopyToAsync(ms, ct).ConfigureAwait(false);
+                                var filePass = Path.Combine(imageDirectory, FileUrlToFileName().Replace(response.Address.Href, "$1"));
+                                File.WriteAllBytes(filePass, ms.ToArray());
+                                section.Elements.Add(new Picture(filePass));
+                            }
+                        }
+                    }
+                    else if (item.Children[0].TagName == "RUBY")
+                    {
+                        if (!string.IsNullOrWhiteSpace(item.InnerHtml))
+                        {
+                            foreach (var split in SplitBrace(item.InnerHtml))
+                            {
+                                section.Elements.Add(new Paragraph() { Text = split });
+                            }
+                        }
+                    }
+                    else if (item.Children[0] is not IHtmlBreakRowElement)
+                        throw new EpubDocumentException("Unexpected structure");
+                }
+                else
+                {
+                    bool isAllRuby = true;
+                    foreach (var tags in item.Children)
+                    {
+                        if (tags.TagName != "RUBY")
+                        {
+                            isAllRuby = false;
+                        }
+                    }
+
+                    if (!isAllRuby)
+                        throw new EpubDocumentException("Unexpected structure");
+
+                    if (!string.IsNullOrWhiteSpace(item.InnerHtml))
+                    {
+                        foreach (var split in SplitBrace(item.InnerHtml))
+                        {
+                            section.Elements.Add(new Paragraph() { Text = split });
+                        }
+                    }
+                }
             }
             return new SectionWithChapterTitle(chapterTitle, section);
         }
