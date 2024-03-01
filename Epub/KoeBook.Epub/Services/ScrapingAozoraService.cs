@@ -4,21 +4,20 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
-using static KoeBook.Epub.ScrapingHelper;
+using static KoeBook.Epub.Utility.ScrapingHelper;
 
 
 namespace KoeBook.Epub.Services
 {
-    public partial class ScrapingAozora : IScrapingService
+    public partial class ScrapingAozoraService : IScrapingAozoraService
     {
-        private int chapterNum;
-        private int sectionNum;
-        private bool chapterExist = false;
-        private bool sectionExist = false;
-
-
-        public async Task<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
+        public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
         {
+            var chapterNum = 0;
+            var sectionNum = 0;
+            var chapterExist = false;
+            var sectionExist = false;
+
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
@@ -61,7 +60,7 @@ namespace KoeBook.Epub.Services
                         }
                         if ((MidashiId - previousMidashiId) == 10)
                         {
-                            checkChapter(document);
+                            EnsureChapter(document);
                             document.Chapters[^1].Sections.Add(new Section(TextProcess(midashi)));
                             sectionExist = true;
                         }
@@ -97,7 +96,7 @@ namespace KoeBook.Epub.Services
                 {
                     if (previous == true)
                     {
-                        checkSection(document, chapterNum);
+                        EnsureSection(document, chapterNum);
                         document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
                     }
                 }
@@ -156,12 +155,12 @@ namespace KoeBook.Epub.Services
                             {
                                 if (sectionExist)
                                 {
-                                    checkChapter(document);
+                                    EnsureChapter(document);
                                     document.Chapters[^1].Sections.Insert(0, new Section("___"));
                                 }
                                 sectionNum++;
                             }
-                            checkParagraph(document, chapterNum, sectionNum);
+                            EnsureParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
                                 paragraph.Text += TextProcess(midashi);
@@ -183,7 +182,7 @@ namespace KoeBook.Epub.Services
                         if (element.ClassName == "caption")
                         {
                             // https://www.aozora.gr.jp/annotation/graphics.html#:~:text=%3Cdiv%20class%3D%22caption%22%3E を処理するための部分
-                            checkParagraph(document, chapterNum, sectionNum);
+                            EnsureParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
                                 var split = SplitBrace(TextProcess(element));
@@ -216,12 +215,12 @@ namespace KoeBook.Epub.Services
                             {
                                 if (sectionExist)
                                 {
-                                    checkChapter(document);
+                                    EnsureChapter(document);
                                     document.Chapters[^1].Sections.Insert(0, new Section("___"));
                                 }
                                 sectionNum++;
                             }
-                            checkParagraph(document, chapterNum, sectionNum);
+                            EnsureParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
                                 foreach (var splitText in SplitBrace(TextProcess(element)))
@@ -253,7 +252,7 @@ namespace KoeBook.Epub.Services
                         {
                             if (sectionExist)
                             {
-                                checkChapter(document);
+                                EnsureChapter(document);
                                 document.Chapters[^1].Sections.Insert(0, new Section("___"));
                             }
                             sectionNum++;
@@ -274,7 +273,7 @@ namespace KoeBook.Epub.Services
                                     await response.Content.CopyToAsync(ms, ct).ConfigureAwait(false);
                                     var filePass = System.IO.Path.Combine(imageDirectory, FileUrlToFileName().Replace(img.Source, "$1"));
                                     File.WriteAllBytes(filePass, ms.ToArray());
-                                    checkSection(document, chapterNum);
+                                    EnsureSection(document, chapterNum);
                                     if (document.Chapters[chapterNum].Sections[sectionNum].Elements.Count > 1)
                                     {
                                         document.Chapters[chapterNum].Sections[sectionNum].Elements.Insert(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1, new Picture(filePass));
@@ -283,7 +282,7 @@ namespace KoeBook.Epub.Services
                             }
                             if (img.AlternativeText != null)
                             {
-                                checkParagraph(document, chapterNum, sectionNum);
+                                EnsureParagraph(document, chapterNum, sectionNum);
                                 if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                                 {
                                     paragraph.Text += TextReplace(img.AlternativeText);
@@ -332,7 +331,7 @@ namespace KoeBook.Epub.Services
                             case "［＃ページの左右中央］":
                                 break;
                             default:
-                                checkParagraph(document, chapterNum, sectionNum);
+                                EnsureParagraph(document, chapterNum, sectionNum);
                                 if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                                 {
                                     foreach (var splitText in SplitBrace(TextProcess(element)))
@@ -362,12 +361,12 @@ namespace KoeBook.Epub.Services
                         {
                             if (sectionExist)
                             {
-                                checkChapter(document);
+                                EnsureChapter(document);
                                 document.Chapters[^1].Sections.Insert(0, new Section("___"));
                             }
                             sectionNum++;
                         }
-                        checkParagraph(document, chapterNum, sectionNum);
+                        EnsureParagraph(document, chapterNum, sectionNum);
                         if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                         {
                             var split = SplitBrace(TextProcess(element));
@@ -402,12 +401,12 @@ namespace KoeBook.Epub.Services
                     {
                         if (sectionExist)
                         {
-                            checkChapter(document);
+                            EnsureChapter(document);
                             document.Chapters[^1].Sections.Insert(0, new Section("___"));
                         }
                         sectionNum++;
                     }
-                    checkParagraph(document, chapterNum, sectionNum);
+                    EnsureParagraph(document, chapterNum, sectionNum);
                     if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                     {
                         paragraph.Text += TextProcess(element);
@@ -450,12 +449,12 @@ namespace KoeBook.Epub.Services
                             {
                                 if (sectionExist)
                                 {
-                                    checkChapter(document);
+                                    EnsureChapter(document);
                                     document.Chapters[^1].Sections.Insert(0, new Section("___"));
                                 }
                                 sectionNum++;
                             }
-                            checkParagraph(document, chapterNum, sectionNum);
+                            EnsureParagraph(document, chapterNum, sectionNum);
                             if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
                             {
                                 var split = SplitBrace(TextReplace(nextNode.Text()));

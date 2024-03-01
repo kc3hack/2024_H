@@ -7,9 +7,9 @@ using KoeBook.Epub.Models;
 
 namespace KoeBook.Core.Services;
 
-public partial class AnalyzerService(IScrapingService scrapingService, IEpubDocumentStoreService epubDocumentStoreService, ILlmAnalyzerService llmAnalyzerService) : IAnalyzerService
+public partial class AnalyzerService(IScraperSelectorService scrapingService, IEpubDocumentStoreService epubDocumentStoreService, ILlmAnalyzerService llmAnalyzerService) : IAnalyzerService
 {
-    private readonly IScrapingService _scrapingService = scrapingService;
+    private readonly IScraperSelectorService _scrapingService = scrapingService;
     private readonly IEpubDocumentStoreService _epubDocumentStoreService = epubDocumentStoreService;
     private readonly ILlmAnalyzerService _llmAnalyzerService = llmAnalyzerService;
     private Dictionary<string, string> _rubyReplacements = new Dictionary<string, string>();

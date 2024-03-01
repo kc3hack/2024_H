@@ -5,20 +5,15 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
-using static KoeBook.Epub.ScrapingHelper;
+using static KoeBook.Epub.Utility.ScrapingHelper;
 
 namespace KoeBook.Epub.Services
 {
-    public partial class ScrapingNarouService : IScrapingService
+    public partial class ScrapingNaroService(IHttpClientFactory httpClientFactory) : IScrapingNaroService
     {
-        public ScrapingNarouService(IHttpClientFactory httpClientFactory)
-        {
-            _httpCliantFactory = httpClientFactory;
-        }
+        private readonly IHttpClientFactory _httpCliantFactory = httpClientFactory;
 
-        private readonly IHttpClientFactory _httpCliantFactory;
-
-        public async Task<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
+        public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
