@@ -1,12 +1,8 @@
-﻿using System.ComponentModel;
-using System.Drawing;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO.Compression;
 using System.Text;
-using System.Xml;
-using NAudio.Mixer;
 
-namespace KoeBook.Epub;
+namespace KoeBook.Epub.Models;
 
 public class EpubDocument(string title, string author, string coverFilePath, Guid id)
 {
@@ -57,7 +53,7 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
             """);
         if (Chapters.Count == 1 && Chapters[0].Title == null)
         {
-            for (int i = 0; i < Chapters[0].Sections.Count; i++)
+            for (var i = 0; i < Chapters[0].Sections.Count; i++)
             {
                 builder.AppendLine($"""
                                 <li>
@@ -68,14 +64,14 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
         }
         else
         {
-            for (int i = 0; i < Chapters.Count; i++)
+            for (var i = 0; i < Chapters.Count; i++)
             {
                 builder.AppendLine($"""
                                     <li>
                                         <span>{Chapters[i].Title}</span>
                                         <ol>
                     """);
-                for (int j = 0; j < Chapters[i].Sections.Count; j++)
+                for (var j = 0; j < Chapters[i].Sections.Count; j++)
                 {
                     builder.AppendLine($"""
                                                 <li>
@@ -126,9 +122,9 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
             """);
 
         var totalTime = TimeSpan.Zero;
-        for (int i = 0; i < Chapters.Count; i++)
+        for (var i = 0; i < Chapters.Count; i++)
         {
-            for (int j = 0; j < Chapters[i].Sections.Count; j++)
+            for (var j = 0; j < Chapters[i].Sections.Count; j++)
             {
                 var time = Chapters[i].Sections[j].GetTotalTime();
                 totalTime += time;
@@ -146,9 +142,9 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
                     <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
             """);
 
-        for (int i = 0; i < Chapters.Count; i++)
+        for (var i = 0; i < Chapters.Count; i++)
         {
-            for (int j = 0; j < Chapters[i].Sections.Count; j++)
+            for (var j = 0; j < Chapters[i].Sections.Count; j++)
             {
                 builder.AppendLine($"""
                                 <item id="section_{i}_{j}" href="{Chapters[i].Sections[j].Id}.xhtml" media-type="application/xhtml+xml" media-overlay="smil_{i}_{j}" />
@@ -174,9 +170,9 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
                 <spine page-progression-direction="ltr">
             """);
 
-        for (int i = 0; i < Chapters.Count; i++)
+        for (var i = 0; i < Chapters.Count; i++)
         {
-            for (int j = 0; j < Chapters[i].Sections.Count; j++)
+            for (var j = 0; j < Chapters[i].Sections.Count; j++)
             {
                 builder.AppendLine($"""
                                 <itemref idref="section_{i}_{j}" id="itemref_{i}_{j}" />
@@ -239,9 +235,9 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
                 await opfStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
-            for (int i = 0; i < Chapters.Count; i++)
+            for (var i = 0; i < Chapters.Count; i++)
             {
-                for (int j = 0; j < Chapters[i].Sections.Count; j++)
+                for (var j = 0; j < Chapters[i].Sections.Count; j++)
                 {
                     var sectionXhtmlEntry = archive.CreateEntry($"OEBPS/{Chapters[i].Sections[j].Id}.xhtml");
                     using (var sectionXhtmlStream = new StreamWriter(sectionXhtmlEntry.Open()))

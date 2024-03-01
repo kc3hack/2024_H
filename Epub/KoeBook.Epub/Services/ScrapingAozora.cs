@@ -2,12 +2,12 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
-using KoeBook.Epub.Service;
-using System.IO;
+using KoeBook.Epub.Contracts.Services;
+using KoeBook.Epub.Models;
 using static KoeBook.Epub.ScrapingHelper;
 
 
-namespace KoeBook.Epub
+namespace KoeBook.Epub.Services
 {
     public partial class ScrapingAozora : IScrapingService
     {
@@ -24,18 +24,12 @@ namespace KoeBook.Epub
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
 
             // title の取得
-            var bookTitle = doc.QuerySelector(".title");
-            if (bookTitle is null)
-            {
-                throw new EpubDocumentException($"Failed to get title properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
-            }
+            var bookTitle = doc.QuerySelector(".title")
+                ?? throw new EpubDocumentException($"Failed to get title properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
 
             // auther の取得
-            var bookAuther = doc.QuerySelector(".author");
-            if (bookAuther is null)
-            {
-                throw new EpubDocumentException($"Failed to get auther properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
-            }
+            var bookAuther = doc.QuerySelector(".author")
+                ?? throw new EpubDocumentException($"Failed to get auther properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
 
             // EpubDocument の生成
             var document = new EpubDocument(TextReplace(bookTitle.InnerHtml), TextReplace(bookAuther.InnerHtml), coverFilePath, id)
@@ -112,84 +106,76 @@ namespace KoeBook.Epub
                     var midashi = element.QuerySelector(".midashi_anchor");
                     if (midashi != null)
                     {
-                        if (midashi.Id != null)
+                        if (midashi.Id == null)
+                            throw new EpubDocumentException("Unecpected structure of HTML File: div tag with class=\"midashi_anchor\", but id=\"midashi___\" exist");
+
+                        if (!int.TryParse(midashi.Id.Replace("midashi", ""), out var midashiId))
+                            throw new EpubDocumentException($"Unexpected id of Anchor tag was found: id = {midashi.Id}");
+
+                        if (contentsIds.Contains(midashiId))
                         {
-                            if (int.TryParse(midashi.Id.Replace("midashi", ""), out var midashiId))
+                            var contentsId = contentsIds.IndexOf(midashiId);
+                            switch (contentsIds[contentsId] - contentsIds[contentsId - 1])
                             {
-                                if (contentsIds.Contains(midashiId))
-                                {
-                                    var contentsId = contentsIds.IndexOf(midashiId);
-                                    switch (contentsIds[contentsId] - contentsIds[contentsId - 1])
+                                case 100:
+                                    if (chapterNum >= 0 && sectionNum >= 0)
                                     {
-                                        case 100:
-                                            if (chapterNum >= 0 && sectionNum >= 0)
-                                            {
-                                                document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
-                                            }
-                                            chapterNum++;
-                                            sectionNum = -1;
-                                            break;
-                                        case 10:
-                                            if (chapterNum == -1)
-                                            {
-                                                chapterNum++;
-                                                sectionNum = -1;
-                                            }
-                                            if (chapterNum >= 0 && sectionNum >= 0)
-                                            {
-                                                document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
-                                            }
-                                            sectionNum++;
-                                            break;
-                                        default:
-                                            break;
+                                        document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
                                     }
-                                }
-                                else //小見出し、行中小見出しの処理
-                                {
+                                    chapterNum++;
+                                    sectionNum = -1;
+                                    break;
+                                case 10:
                                     if (chapterNum == -1)
                                     {
-                                        if (chapterExist)
-                                        {
-                                            document.Chapters.Insert(0, new Chapter());
-                                        }
                                         chapterNum++;
                                         sectionNum = -1;
                                     }
-                                    if (sectionNum == -1)
+                                    if (chapterNum >= 0 && sectionNum >= 0)
                                     {
-                                        if (sectionExist)
-                                        {
-                                            checkChapter(document);
-                                            document.Chapters[^1].Sections.Insert(0, new Section("___"));
-                                        }
-                                        sectionNum++;
+                                        document.Chapters[chapterNum].Sections[sectionNum].Elements.RemoveAt(document.Chapters[chapterNum].Sections[sectionNum].Elements.Count - 1);
                                     }
-                                    checkParagraph(document, chapterNum, sectionNum);
-                                    if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
-                                    {
-                                        paragraph.Text += TextProcess(midashi);
-                                        document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
-
-                                        foreach (var splitText in SplitBrace(TextProcess(midashi)))
-                                        {
-                                            if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
-                                            {
-                                                paragraph1.Text += splitText;
-                                            }
-                                            document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                throw new EpubDocumentException($"Unexpected id of Anchor tag was found: id = {midashi.Id}");
+                                    sectionNum++;
+                                    break;
+                                default:
+                                    break;
                             }
                         }
-                        else
+                        else //小見出し、行中小見出しの処理
                         {
-                            throw new EpubDocumentException("Unecpected structure of HTML File: div tag with class=\"midashi_anchor\", but id=\"midashi___\" exist");
+                            if (chapterNum == -1)
+                            {
+                                if (chapterExist)
+                                {
+                                    document.Chapters.Insert(0, new Chapter());
+                                }
+                                chapterNum++;
+                                sectionNum = -1;
+                            }
+                            if (sectionNum == -1)
+                            {
+                                if (sectionExist)
+                                {
+                                    checkChapter(document);
+                                    document.Chapters[^1].Sections.Insert(0, new Section("___"));
+                                }
+                                sectionNum++;
+                            }
+                            checkParagraph(document, chapterNum, sectionNum);
+                            if ((document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph))
+                            {
+                                paragraph.Text += TextProcess(midashi);
+                                document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+
+                                foreach (var splitText in SplitBrace(TextProcess(midashi)))
+                                {
+                                    if (document.Chapters[chapterNum].Sections[sectionNum].Elements[^1] is Paragraph paragraph1)
+                                    {
+                                        paragraph1.Text += splitText;
+                                    }
+                                    document.Chapters[chapterNum].Sections[sectionNum].Elements.Add(new Paragraph());
+                                }
+                            }
                         }
                     }
                     else

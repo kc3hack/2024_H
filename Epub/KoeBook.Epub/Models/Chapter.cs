@@ -1,4 +1,4 @@
-﻿namespace KoeBook.Epub;
+﻿namespace KoeBook.Epub.Models;
 
 public class Chapter
 {
