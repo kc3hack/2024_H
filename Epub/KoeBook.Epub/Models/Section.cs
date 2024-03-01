@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace KoeBook.Epub;
+namespace KoeBook.Epub.Models;
 
 public sealed class Section(string title)
 {
@@ -20,7 +20,7 @@ public sealed class Section(string title)
                 <body>
             """);
 
-        for (int i = 0; i < Elements.Count; i++)
+        for (var i = 0; i < Elements.Count; i++)
         {
             if (Elements[i] is Paragraph para)
             {
@@ -55,7 +55,7 @@ public sealed class Section(string title)
                 <body>
             """);
 
-        for (int i = 0; i < Elements.Count; i++)
+        for (var i = 0; i < Elements.Count; i++)
         {
             if (Elements[i] is Paragraph para && para.Audio != null)
             {

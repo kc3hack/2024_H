@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using KoeBook.Core.Contracts.Services;
-using KoeBook.Epub;
+using KoeBook.Epub.Models;
 
 namespace KoeBook.Core.Services;
 

@@ -1,4 +1,4 @@
-﻿using KoeBook.Epub;
+﻿using KoeBook.Epub.Models;
 
 namespace KoeBook.Core.Contracts.Services;
 

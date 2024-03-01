@@ -2,6 +2,7 @@
 using KoeBook.Core.Helpers;
 using KoeBook.Core.Models;
 using KoeBook.Epub;
+using KoeBook.Epub.Models;
 using static KoeBook.Core.Helpers.IDisplayStateChangeEx;
 
 namespace KoeBook.Services.CoreMocks;

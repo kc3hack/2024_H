@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using KoeBook.Core.Contracts.Services;
 using KoeBook.Core.Models;
 using KoeBook.Epub;
-using KoeBook.Epub.Service;
+using KoeBook.Epub.Services;
 
 namespace KoeBook.Core.Services;
 

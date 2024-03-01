@@ -1,7 +1,6 @@
-﻿using System;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 
-namespace KoeBook.Epub;
+namespace KoeBook.Epub.Models;
 
 public sealed class Audio
 {

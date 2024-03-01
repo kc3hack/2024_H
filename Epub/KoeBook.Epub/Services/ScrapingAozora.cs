@@ -2,12 +2,13 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
-using KoeBook.Epub.Service;
+using KoeBook.Epub.Contracts.Services;
+using KoeBook.Epub.Models;
 using System.IO;
 using static KoeBook.Epub.ScrapingHelper;
 
 
-namespace KoeBook.Epub
+namespace KoeBook.Epub.Services
 {
     public partial class ScrapingAozora : IScrapingService
     {

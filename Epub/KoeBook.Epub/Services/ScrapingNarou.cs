@@ -2,12 +2,13 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
-using KoeBook.Epub.Service;
+using KoeBook.Epub.Contracts.Services;
+using KoeBook.Epub.Models;
 using System.IO;
 using System.Net.Http.Json;
 using static KoeBook.Epub.ScrapingHelper;
 
-namespace KoeBook.Epub
+namespace KoeBook.Epub.Services
 {
     public partial class ScrapingNarouService : IScrapingService
     {
@@ -87,7 +88,7 @@ namespace KoeBook.Epub
                 for (int i = 1; i <= allNum; i++)
                 {
                     Console.WriteLine(i);
-                    await Task.Delay(500);
+                    await Task.Delay(500, ct);
                     var pageUrl = System.IO.Path.Combine(url, i.ToString());
                     var load = await ReadPageAsync(pageUrl, isRensai, imageDirectory, ct).ConfigureAwait(false);
                     SectionWithChapterTitleList.Add(load);
