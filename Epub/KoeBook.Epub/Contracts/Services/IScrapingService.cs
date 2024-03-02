@@ -2,7 +2,7 @@
 
 namespace KoeBook.Epub.Contracts.Services;
 
-public interface IScrapingService
+public interface IScrapingService : IScraperSelectorService
 {
-    public Task<EpubDocument> ScrapingAsync(string url, string coverFillePath, string imageDirectory, Guid id, CancellationToken ct);
+    public bool IsMatchSite(Uri url);
 }

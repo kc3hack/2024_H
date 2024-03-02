@@ -98,8 +98,10 @@ public partial class App : Application
                 services.AddSingleton<IAnalyzerService, AnalyzerService>();
                 services.AddSingleton<ILlmAnalyzerService, ChatGptAnalyzerService>();
                 services.AddSingleton<OpenAI.Interfaces.IOpenAIService, MyOpenAiService>();
-                // TODO: 切り替えサービスを作成
-                services.AddSingleton<IScrapingService, ScrapingAozora>();
+
+                services.AddSingleton<IScraperSelectorService, ScraperSelectorService>()
+                    .AddSingleton<IScrapingService, ScrapingAozoraService>()
+                    .AddSingleton<IScrapingService, ScrapingNaroService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();

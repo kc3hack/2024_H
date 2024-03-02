@@ -37,6 +37,33 @@ public class EpubDocument(string title, string author, string coverFilePath, Gui
     ];
     public List<Chapter> Chapters { get; set; } = [];
 
+    internal void EnsureChapter()
+    {
+        if (Chapters.Count == 0)
+            Chapters.Add(new Chapter() { Title = null });
+    }
+
+    internal void EnsureSection(int chapterIndex)
+    {
+        EnsureChapter();
+
+        if (Chapters[chapterIndex].Sections.Count == 0)
+        {
+            if (Chapters[chapterIndex].Title != null)
+                Chapters[chapterIndex].Sections.Add(new Section(Chapters[chapterIndex].Title!));
+            else
+                Chapters[chapterIndex].Sections.Add(new Section(Title));
+        }
+    }
+
+    internal void EnsureParagraph(int chapterIndex, int sectionIndex)
+    {
+        EnsureSection(chapterIndex);
+
+        if (Chapters[chapterIndex].Sections[sectionIndex].Elements.Count == 0)
+            Chapters[chapterIndex].Sections[sectionIndex].Elements.Add(new Paragraph());
+    }
+
     public string CreateNavXhtml()
     {
         var builder = new StringBuilder($"""
