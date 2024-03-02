@@ -9,9 +9,14 @@ using static KoeBook.Epub.Utility.ScrapingHelper;
 
 namespace KoeBook.Epub.Services
 {
-    public partial class ScrapingNaroService(IHttpClientFactory httpClientFactory) : IScrapingNaroService
+    public partial class ScrapingNaroService(IHttpClientFactory httpClientFactory) : IScrapingService
     {
         private readonly IHttpClientFactory _httpCliantFactory = httpClientFactory;
+
+        public bool IsMatchSite(Uri uri)
+        {
+            return uri.Host == "ncode.syosetu.com";
+        }
 
         public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
         {

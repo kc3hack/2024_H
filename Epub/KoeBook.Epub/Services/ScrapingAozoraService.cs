@@ -9,8 +9,13 @@ using static KoeBook.Epub.Utility.ScrapingHelper;
 
 namespace KoeBook.Epub.Services
 {
-    public partial class ScrapingAozoraService : IScrapingAozoraService
+    public partial class ScrapingAozoraService : IScrapingService
     {
+        public bool IsMatchSite(Uri uri)
+        {
+            return uri.Host == "www.aozora.gr.jp";
+        }
+
         public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
         {
             var chapterNum = 0;

@@ -1,19 +1,23 @@
-﻿using KoeBook.Epub.Contracts.Services;
+﻿using System.Collections.Immutable;
+using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
 
 namespace KoeBook.Epub.Services;
 
-public class ScraperSelectorService(IScrapingAozoraService scrapingAozoraService, IScrapingNaroService scrapingNaroService) : IScraperSelectorService
+public class ScraperSelectorService(IEnumerable<IScrapingService> scrapingServices) : IScraperSelectorService
 {
-    public ValueTask<EpubDocument> ScrapingAsync(string url, string coverFillePath, string tempDirectory, Guid id, CancellationToken ct)
+    private readonly ImmutableArray<IScrapingService> _scrapingServices = scrapingServices.ToImmutableArray();
+
+    public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFillePath, string tempDirectory, Guid id, CancellationToken ct)
     {
         var uri = new Uri(url);
 
-        return uri.Host switch
+        foreach (var service in _scrapingServices)
         {
-            "www.aozora.gr.jp" => scrapingAozoraService.ScrapingAsync(url, coverFillePath, tempDirectory, id, ct),
-            "ncode.syosetu.com" => scrapingNaroService.ScrapingAsync(url, coverFillePath, tempDirectory, id, ct),
-            _ => throw new ArgumentException("有効なドメインではありません。"),
-        };
+            if (service.IsMatchSite(uri))
+                return await service.ScrapingAsync(url, coverFillePath, tempDirectory, id, ct);
+        }
+
+        throw new ArgumentException("対応するURLではありません");
     }
 }
