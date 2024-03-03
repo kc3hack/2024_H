@@ -34,10 +34,9 @@ public static class ScrapingHelper
                 startIdx = i + 1;
             }
         }
-        result.Add(text[startIdx..]);
-        if (result[^1] == "")
+        if (startIdx != brackets.Length)
         {
-            result.RemoveAt(result.Count - 1);
+            result.Add(text[startIdx..]);
         }
 
         return result;
