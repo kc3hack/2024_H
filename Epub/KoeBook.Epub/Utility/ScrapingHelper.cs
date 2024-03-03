@@ -34,7 +34,7 @@ public static class ScrapingHelper
                 startIdx = i + 1;
             }
         }
-        if (startIdx != brackets.Length)
+        if (startIdx != text.Length)
         {
             result.Add(text[startIdx..]);
         }
