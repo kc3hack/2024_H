@@ -25,6 +25,7 @@ public class ScrapingHelperTest
             ("「abc」abc「abc」abc", ["「abc」", "abc", "「abc」", "abc"]),
             ("abc「abc」「abc」abc", ["abc", "「abc」", "「abc」", "abc"]),
             ("abc「abc」abc「abc」", ["abc", "「abc」", "abc", "「abc」"]),
+            ("abc「abc「abc」abc」abc", ["abc", "「abc「abc」abc」", "abc"]),
             ("abc「abc「abc」abc", ["abc", "「abc「abc」abc"]),
             ("abc「abc」abc」abc", ["abc「abc」abc」", "abc"]),
             ("abc「abc「abc", ["abc", "「abc「abc"]),
