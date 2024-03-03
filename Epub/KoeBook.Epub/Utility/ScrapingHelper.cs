@@ -23,21 +23,18 @@ public static class ScrapingHelper
         for (var i = 0; i < brackets.Length; i++)
         {
             brackets[i] -= mn;
-            if (text[i] == '「' && brackets[i] == 1 && i != 0)
+            if (text[i] == '「' && brackets[i] == 1 && i != 0 && startIdx != i)
             {
                 result.Add(text[startIdx..i]);
                 startIdx = i;
             }
-            if (text[i] == '」' && brackets[i] == 0 && i != 0)
+            if (text[i] == '」' && brackets[i] == 0)
             {
                 result.Add(text[startIdx..(i + 1)]);
                 startIdx = i + 1;
             }
         }
-        if (startIdx != text.Length - 1)
-        {
-            result.Add(text[startIdx..]);
-        }
+        result.Add(text[startIdx..]);
         if (result[^1] == "")
         {
             result.RemoveAt(result.Count - 1);
