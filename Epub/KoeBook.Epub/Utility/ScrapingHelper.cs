@@ -4,7 +4,7 @@ public static class ScrapingHelper
 {
     public static List<string> SplitBrace(string text)
     {
-        if (text.Length == 1 && text != "「" && text != "」")
+        if (text.Length == 1 && (text == "「" || text == "」"))
             return [text];
 
         var bracket = 0;
