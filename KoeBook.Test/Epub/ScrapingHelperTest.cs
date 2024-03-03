@@ -4,34 +4,37 @@ namespace KoeBook.Test.Epub;
 
 public class ScrapingHelperTest
 {
-    public static IEnumerable<object[]> Data()
+    public static object[][] TestCases()
     {
-        yield return new object[] { "「", new List<string> { "「" } };
-        yield return new object[] { "」", new List<string> { "」" } };
-        yield return new object[] { "a", new List<string> { "a" } };
-        yield return new object[] { "abc「abc」abc", new List<string> { "abc", "「abc」", "abc" } };
-        yield return new object[] { "abc「abc」", new List<string> { "abc", "「abc」" } };
-        yield return new object[] { "「abc」abc", new List<string> { "「abc」", "abc", } };
-        yield return new object[] { "abc「abc」", new List<string> { "abc", "「abc」" } };
-        yield return new object[] { "「abc」", new List<string> { "「abc」", } };
-        yield return new object[] { "abc「abc", new List<string> { "abc", "「abc" } };
-        yield return new object[] { "abc「", new List<string> { "abc", "「" } };
-        yield return new object[] { "「abc", new List<string> { "「abc" } };
-        yield return new object[] { "abc」abc", new List<string> { "abc」", "abc" } };
-        yield return new object[] { "abc」", new List<string> { "abc」" } };
-        yield return new object[] { "」abc", new List<string> { "」", "abc" } };
-        yield return new object[] { "abc「abc」abc「abc」abc", new List<string> { "abc", "「abc」", "abc", "「abc」", "abc" } };
-        yield return new object[] { "「abc」abc「abc」abc", new List<string> { "「abc」", "abc", "「abc」", "abc" } };
-        yield return new object[] { "abc「abc」「abc」abc", new List<string> { "abc", "「abc」", "「abc」", "abc" } };
-        yield return new object[] { "abc「abc」abc「abc」", new List<string> { "abc", "「abc」", "abc", "「abc」" } };
-        yield return new object[] { "abc「abc「abc」abc", new List<string> { "abc", "「abc「abc」abc" } };
-        yield return new object[] { "abc「abc」abc」abc", new List<string> { "abc「abc」abc」", "abc" } };
-        yield return new object[] { "abc「abc「abc", new List<string> { "abc", "「abc「abc" } };
-        yield return new object[] { "abc」abc」abc", new List<string> { "abc」abc」", "abc" } };
+        (string, List<string>)[] cases = [
+            ("「", ["「"]),
+            ("」", ["」"]),
+            ("a", ["a"]),
+            ("abc「abc」abc", ["abc", "「abc」", "abc"]),
+            ("abc「abc」", ["abc", "「abc」"]),
+            ("「abc」abc", ["「abc」", "abc",]),
+            ("abc「abc」", ["abc", "「abc」"]),
+            ("「abc」", ["「abc」",]),
+            ("abc「abc", ["abc", "「abc"]),
+            ("abc「", ["abc", "「"]),
+            ("「abc", ["「abc"]),
+            ("abc」abc", ["abc」", "abc"]),
+            ("abc」", ["abc」"]),
+            ("」abc", ["」", "abc"]),
+            ("abc「abc」abc「abc」abc", ["abc", "「abc」", "abc", "「abc」", "abc"]),
+            ("「abc」abc「abc」abc", ["「abc」", "abc", "「abc」", "abc"]),
+            ("abc「abc」「abc」abc", ["abc", "「abc」", "「abc」", "abc"]),
+            ("abc「abc」abc「abc」", ["abc", "「abc」", "abc", "「abc」"]),
+            ("abc「abc「abc」abc", ["abc", "「abc「abc」abc"]),
+            ("abc「abc」abc」abc", ["abc「abc」abc」", "abc"]),
+            ("abc「abc「abc", ["abc", "「abc「abc"]),
+            ("abc」abc」abc", ["abc」abc」", "abc"])
+        ];
+        return cases.Select(c => new object[] { c.Item1, c.Item2 }).ToArray();
     }
 
     [Theory]
-    [MemberData(nameof(Data))]
+    [MemberData(nameof(TestCases))]
     public void SplitBraceTest(string text, List<string> expected)
     {
         Assert.Equal(expected, ScrapingHelper.SplitBrace(text));
