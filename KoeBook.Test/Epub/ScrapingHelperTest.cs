@@ -24,6 +24,10 @@ public class ScrapingHelperTest
         yield return new object[] { "「abc」abc「abc」abc", new List<string> { "「abc」", "abc", "「abc」", "abc" } };
         yield return new object[] { "abc「abc」「abc」abc", new List<string> { "abc", "「abc」", "「abc」", "abc" } };
         yield return new object[] { "abc「abc」abc「abc」", new List<string> { "abc", "「abc」", "abc", "「abc」" } };
+        yield return new object[] { "abc「abc「abc」abc", new List<string> { "abc", "「abc「abc」abc" } };
+        yield return new object[] { "abc「abc」abc」abc", new List<string> { "abc「abc」abc」", "abc" } };
+        yield return new object[] { "abc「abc「abc", new List<string> { "abc", "「abc「abc" } };
+        yield return new object[] { "abc」abc」abc", new List<string> { "abc」abc」", "abc" } };
     }
 
     [Theory]
