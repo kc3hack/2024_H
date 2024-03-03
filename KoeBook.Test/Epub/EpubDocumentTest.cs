@@ -45,7 +45,8 @@ public class EpubDocumentTest
 
         // 空でないときは無視
         document.Chapters = [
-            new() {
+            new()
+            {
                 Title = "chapter1",
                 Sections = [
                     new("section1"),
@@ -53,7 +54,8 @@ public class EpubDocumentTest
                     new("section3"),
                 ],
             },
-            new() {
+            new()
+            {
                 Title = "chapter2",
                 Sections = [],
             },
@@ -93,17 +95,21 @@ public class EpubDocumentTest
 
         // 空でないときは無視
         document.Chapters = [
-            new() {
+            new()
+            {
                 Title = "chapter1",
                 Sections = [
-                    new("section1") {
+                    new("section1")
+                    {
                         Elements = [
-                            new Paragraph() {
+                            new Paragraph()
+                            {
                                 Text = "paragraph1",
                             },
                         ]
                     },
-                    new("section1") {
+                    new("section1")
+                    {
                         Elements = []
                     },
                 ],
