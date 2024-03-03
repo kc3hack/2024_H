@@ -6,9 +6,9 @@ using System.IO.Compression;
 using System.Text;
 
 namespace KoeBook.Epub.Services;
-public class EpubGeneration : IEpubGeneration
+public class EpubCreateService : IEpubCreateService
 {
-    public async ValueTask<bool> TryCreateEpubAsync(EpubDocument epubDocument,string tmpDirectory, CancellationToken ct)
+    public async ValueTask<bool> TryCreateEpubAsync(EpubDocument epubDocument, string tmpDirectory, CancellationToken ct)
     {
         if (!File.Exists(epubDocument.CoverFilePath))
         {
