@@ -8,7 +8,7 @@ public class UnitTest1
     {
         yield return new object[] { "「", new List<string> { "「" } };
         yield return new object[] { "」", new List<string> { "」" } };
-        yield return new object[] { "abc「abc」abc" , new List<string> { "abc", "「abc」", "abc" } };
+        yield return new object[] { "abc「abc」abc", new List<string> { "abc", "「abc」", "abc" } };
         yield return new object[] { "abc「abc」", new List<string> { "abc", "「abc」" } };
         yield return new object[] { "「abc」abc", new List<string> { "「abc」", "abc", } };
         yield return new object[] { "abc「abc」", new List<string> { "abc", "「abc」" } };
@@ -17,7 +17,7 @@ public class UnitTest1
         yield return new object[] { "abc「", new List<string> { "abc", "「" } };
         yield return new object[] { "「abc", new List<string> { "「abc" } };
         yield return new object[] { "abc」abc", new List<string> { "abc」", "abc" } };
-        yield return new object[] { "abc」", new List<string> { "abc」"} };
+        yield return new object[] { "abc」", new List<string> { "abc」" } };
         yield return new object[] { "」abc", new List<string> { "」", "abc" } };
     }
 
