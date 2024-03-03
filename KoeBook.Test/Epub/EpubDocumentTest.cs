@@ -14,14 +14,14 @@ public class EpubDocumentTest
         Assert.Empty(document.Chapters);
 
         // 空のときは追加
-        document.AsPrivateProxy().EnsureChapter();
+        document.EnsureChapter();
 
         var chapter = Assert.Single(document.Chapters);
         Assert.Null(chapter.Title);
         Assert.Empty(chapter.Sections);
 
         // 空でないときは無視
-        document.AsPrivateProxy().EnsureChapter();
+        document.EnsureChapter();
 
         var chapter2 = Assert.Single(document.Chapters);
         Assert.Same(chapter, chapter2);
@@ -35,7 +35,7 @@ public class EpubDocumentTest
         Assert.Empty(document.Chapters);
 
         // 空のときは追加される
-        document.AsPrivateProxy().EnsureSection(0);
+        document.EnsureSection(0);
 
         var chapter = Assert.Single(document.Chapters);
         Assert.Null(chapter.Title);
@@ -59,18 +59,18 @@ public class EpubDocumentTest
             },
         ];
 
-        document.AsPrivateProxy().EnsureSection(0);
+        document.EnsureSection(0);
 
         Assert.Equal(3, document.Chapters[0].Sections.Count);
 
-        document.AsPrivateProxy().EnsureSection(1);
+        document.EnsureSection(1);
 
         Assert.Equal("chapter2", document.Chapters[1].Sections[0].Title);
 
         // インデックスは正しく指定する必要がある
-        var exception = Record.Exception(() => document.AsPrivateProxy().EnsureSection(5));
+        var exception = Record.Exception(() => document.EnsureSection(5));
 
-        Assert.IsType<IndexOutOfRangeException>(exception);
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class EpubDocumentTest
         Assert.Empty(document.Chapters);
 
         // 空のときは追加される
-        document.AsPrivateProxy().EnsureParagraph(0, 0);
+        document.EnsureParagraph(0, 0);
 
         var chapter = Assert.Single(document.Chapters);
         var section = Assert.Single(chapter.Sections);
@@ -103,19 +103,23 @@ public class EpubDocumentTest
                             },
                         ]
                     },
+                    new("section1") {
+                        Elements = []
+                    },
                 ],
             },
         ];
 
-        document.AsPrivateProxy().EnsureParagraph(0, 0);
+        document.EnsureParagraph(0, 0);
 
         chapter = Assert.Single(document.Chapters);
-        section = Assert.Single(chapter.Sections);
+        Assert.Equal(2, chapter.Sections.Count);
+        section = chapter.Sections[0];
         element = Assert.Single(section.Elements);
         paragraph = Assert.IsType<Paragraph>(element);
         Assert.Equal("paragraph1", paragraph.Text);
 
-        document.AsPrivateProxy().EnsureParagraph(0, 1);
+        document.EnsureParagraph(0, 1);
 
         element = Assert.Single(document.Chapters[0].Sections[1].Elements);
         paragraph = Assert.IsType<Paragraph>(element);
@@ -124,9 +128,9 @@ public class EpubDocumentTest
         Assert.Null(paragraph.ClassName);
 
         // インデックスは正しく指定する必要がある
-        var exception = Record.Exception(() => document.AsPrivateProxy().EnsureParagraph(0, 5));
+        var exception = Record.Exception(() => document.EnsureParagraph(0, 5));
 
-        Assert.IsType<IndexOutOfRangeException>(exception);
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
     }
     #endregion
 }
