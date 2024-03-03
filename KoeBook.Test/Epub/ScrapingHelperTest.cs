@@ -1,8 +1,8 @@
 ﻿using KoeBook.Epub.Utility;
 
-namespace KoeBook.Test;
+namespace KoeBook.Test.Epub;
 
-public class UnitTest1
+public class ScrapingHelperTest
 {
     public static IEnumerable<object[]> Data()
     {
