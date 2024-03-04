@@ -1,5 +1,4 @@
 ﻿using KoeBook.Epub.Models;
-using KoeBook.Test.Proxies;
 
 namespace KoeBook.Test.Epub;
 
