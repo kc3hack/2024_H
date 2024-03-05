@@ -66,7 +66,7 @@ namespace KoeBook.Epub.Services
             }
 
             var document = new EpubDocument(bookTitle.InnerHtml, bookAuther.InnerHtml, coverFilePath, id);
-            if (isRensai)
+            if (isRensai) // 連載の時
             {
                 List<SectionWithChapterTitle> SectionWithChapterTitleList = new List<SectionWithChapterTitle>();
                 for (int i = 1; i <= allNum; i++)
@@ -93,6 +93,7 @@ namespace KoeBook.Epub.Services
                         }
                         else
                         {
+                            
                             document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
                         }
                     }
@@ -106,7 +107,7 @@ namespace KoeBook.Epub.Services
                     }
                 }
             }
-            else
+            else // 短編の時
             {
                 var load = await ReadPageAsync(url, isRensai, imageDirectory, ct).ConfigureAwait(false);
                 if (load != null)
@@ -128,13 +129,16 @@ namespace KoeBook.Epub.Services
             using var context = BrowsingContext.New(config);
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
 
-            var chapterTitleElement = doc.QuerySelector(".chapter_title");
             string? chapterTitle = null;
-            if (chapterTitleElement != null)
+            if (!isRensai)
             {
-                if (chapterTitleElement.InnerHtml != null)
+                var chapterTitleElement = doc.QuerySelector(".chapter_title");
+                if (chapterTitleElement != null)
                 {
-                    chapterTitle = chapterTitleElement.InnerHtml;
+                    if (chapterTitleElement.InnerHtml != null)
+                    {
+                        chapterTitle = chapterTitleElement.InnerHtml;
+                    }
                 }
             }
 
