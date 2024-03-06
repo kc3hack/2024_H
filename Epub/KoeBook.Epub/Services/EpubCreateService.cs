@@ -1,13 +1,13 @@
 ﻿using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 
 namespace KoeBook.Epub.Services;
-public class EpubCreateService : IEpubCreateService
+public class EpubCreateService(IFileExtensionService fileExtensionService) : IEpubCreateService
 {
+    private readonly IFileExtensionService _fileExtensionService = fileExtensionService;
     public async ValueTask<bool> TryCreateEpubAsync(EpubDocument epubDocument, string tmpDirectory, CancellationToken ct)
     {
         if (!File.Exists(epubDocument.CoverFilePath))
@@ -29,7 +29,7 @@ public class EpubCreateService : IEpubCreateService
             var containerEntry = archive.CreateEntry("META-INF/container.xml");
             using (var containerStream = new StreamWriter(containerEntry.Open()))
             {
-                await containerStream.WriteLineAsync(epubDocument.CreateContainerXml()).ConfigureAwait(false);
+                await containerStream.WriteLineAsync(CreateContainerXml()).ConfigureAwait(false);
                 await containerStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
@@ -38,21 +38,21 @@ public class EpubCreateService : IEpubCreateService
             var cssEntry = archive.CreateEntry("OEBPS/style.css");
             using (var cssStream = new StreamWriter(cssEntry.Open()))
             {
-                await cssStream.WriteLineAsync(epubDocument.CreateCssText()).ConfigureAwait(false);
+                await cssStream.WriteLineAsync(CreateCssText(epubDocument)).ConfigureAwait(false);
                 await cssStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
             var navEntry = archive.CreateEntry("OEBPS/nav.xhtml");
             using (var navStream = new StreamWriter(navEntry.Open()))
             {
-                await navStream.WriteLineAsync(epubDocument.CreateNavXhtml()).ConfigureAwait(false);
+                await navStream.WriteLineAsync(CreateNavXhtml(epubDocument)).ConfigureAwait(false);
                 await navStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
             var opfEntry = archive.CreateEntry("OEBPS/book.opf");
             using (var opfStream = new StreamWriter(opfEntry.Open()))
             {
-                await opfStream.WriteLineAsync(epubDocument.CreateOpf()).ConfigureAwait(false);
+                await opfStream.WriteLineAsync(CreateOpf(epubDocument)).ConfigureAwait(false);
                 await opfStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
@@ -101,4 +101,163 @@ public class EpubCreateService : IEpubCreateService
             return false;
         }
     }
+
+    internal static string CreateNavXhtml(EpubDocument epubDocument)
+    {
+        var builder = new StringBuilder($"""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+                <head>
+                    <meta charset="UTF-8"/>
+                    <title>{epubDocument.Title}</title>
+                </head>
+                <body>
+                    <nav epub:type="toc" id="toc">
+                        <ol>
+
+            """);
+        if (epubDocument.Chapters.Count == 1 && epubDocument.Chapters[0].Title == null)
+        {
+            for (var i = 0; i < epubDocument.Chapters[0].Sections.Count; i++)
+            {
+                builder.AppendLine($"""
+                                <li>
+                                    <a href="{epubDocument.Chapters[0].Sections[i].Id}.xhtml#s_{epubDocument.Chapters[0].Sections[i].Id}_p0">{epubDocument.Chapters[0].Sections[i].Title}</a>
+                                </li>
+                """);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < epubDocument.Chapters.Count; i++)
+            {
+                builder.AppendLine($"""
+                                    <li>
+                                        <span>{epubDocument.Chapters[i].Title}</span>
+                                        <ol>
+                    """);
+                for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
+                {
+                    builder.AppendLine($"""
+                                                <li>
+                                                    <a href="{epubDocument.Chapters[i].Sections[j].Id}.xhtml#s_{epubDocument.Chapters[i].Sections[j].Id}_p0">{epubDocument.Chapters[i].Sections[j].Title}</a>
+                                                </li>
+                        """);
+                }
+                builder.AppendLine($"""
+                                        </ol>
+                                    </li>
+                    """);
+            }
+        }
+        builder.AppendLine($"""
+                        </ol>
+                    </nav>
+                </body>
+            </html>
+            """);
+        return builder.ToString();
+    }
+
+    internal static string CreateCssText(EpubDocument epubDocument)
+    {
+        var builder = new StringBuilder();
+        foreach (var cssClass in epubDocument.CssClasses)
+        {
+            builder.AppendLine(cssClass.Text);
+        }
+        return builder.ToString();
+    }
+
+    internal string CreateOpf(EpubDocument epubDocument)
+    {
+        var builder = new StringBuilder($"""
+            <package unique-identifier="pub-id" version="3.0" xmlns="http://www.idpf.org/2007/opf">
+                <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <dc:title  id="title">{epubDocument.Title}</dc:title>
+                    <dc:creator id="creator">{epubDocument.Author}</dc:creator>
+                    <meta refines="#creator" property="role" scheme="marc:relators">aut</meta>
+                    <dc:identifier id="pub-id">urn:uuid:{Guid.NewGuid()}</dc:identifier>
+                    <dc:language>ja</dc:language>
+                    <dc:date>{DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)}</dc:date>
+                    <meta property="dcterms:modified">{DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)}</meta>
+                    <meta property="media:active-class">-epub-media-overlay-active</meta>
+                    <meta property="media:playback-active-class">-epub-media-overlay-unactive</meta>
+
+            """);
+
+        var totalTime = TimeSpan.Zero;
+        for (var i = 0; i < epubDocument.Chapters.Count; i++)
+        {
+            for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
+            {
+                var time = epubDocument.Chapters[i].Sections[j].GetTotalTime();
+                totalTime += time;
+                builder.AppendLine($"""
+                                <meta property="media:duration" refines="#smil_{i}_{j}">{time}</meta>
+                        """);
+            }
+        }
+        builder.AppendLine($"""
+                    <meta property="media:duration">{totalTime}</meta>
+                </metadata>
+                <manifest>
+                    <item id="css" media-type="text/css" href="style.css"/>
+                    <item id="cover" href="{Path.GetFileName(epubDocument.CoverFilePath)}" properties="cover-image" media-type="{_fileExtensionService.GetImagesMediaType(epubDocument.CoverFilePath)}" />
+                    <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
+            """);
+
+        for (var i = 0; i < epubDocument.Chapters.Count; i++)
+        {
+            for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
+            {
+                builder.AppendLine($"""
+                                <item id="section_{i}_{j}" href="{epubDocument.Chapters[i].Sections[j].Id}.xhtml" media-type="application/xhtml+xml" media-overlay="smil_{i}_{j}" />
+                                <item id="smil_{i}_{j}" href="{epubDocument.Chapters[i].Sections[j].Id}_audio.smil" media-type="application/smil+xml" />
+                        """);
+                for (var k = 0; k < epubDocument.Chapters[i].Sections[j].Elements.Count; k++)
+                {
+                    var element = epubDocument.Chapters[i].Sections[j].Elements[k];
+                    if (element is Paragraph para && para.Audio != null)
+                    {
+                        builder.AppendLine(@$"        <item id=""audio_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}.mp3"" media-type=""audio/mpeg"" />");
+                    }
+                    else if (element is Picture pic && File.Exists(pic.PictureFilePath))
+                    {
+                        builder.AppendLine(@$"        <item id=""img_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}"" media-type=""{_fileExtensionService.GetImagesMediaType(pic.PictureFilePath)}"" />");
+                    }
+                }
+            }
+        }
+
+        builder.AppendLine($"""
+                </manifest>
+                <spine page-progression-direction="ltr">
+            """);
+
+        for (var i = 0; i < epubDocument.Chapters.Count; i++)
+        {
+            for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
+            {
+                builder.AppendLine($"""
+                                <itemref idref="section_{i}_{j}" id="itemref_{i}_{j}" />
+                        """);
+            }
+        }
+
+        builder.AppendLine($"""
+                </spine>
+            </package>
+            """);
+        return builder.ToString();
+    }
+
+    internal static string CreateContainerXml() => """
+         <?xml version="1.0" encoding="UTF-8"?>
+         <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+             <rootfiles>
+                 <rootfile full-path="OEBPS/book.opf" media-type="application/oebps-package+xml" />
+             </rootfiles>
+         </container>
+         """;
 }
