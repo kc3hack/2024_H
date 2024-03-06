@@ -71,8 +71,7 @@ namespace KoeBook.Epub.Services
                 List<SectionWithChapterTitle> SectionWithChapterTitleList = new List<SectionWithChapterTitle>();
                 for (int i = 1; i <= allNum; i++)
                 {
-                    Console.WriteLine(i);
-                    await Task.Delay(500, ct);
+                    await Task.Delay(1500, ct);
                     var pageUrl = Path.Combine(url, i.ToString());
                     var load = await ReadPageAsync(pageUrl, isRensai, imageDirectory, ct).ConfigureAwait(false);
                     SectionWithChapterTitleList.Add(load);
@@ -93,7 +92,6 @@ namespace KoeBook.Epub.Services
                         }
                         else
                         {
-                            
                             document.Chapters[^1].Sections.Add(sectionWithChapterTitle.section);
                         }
                     }
@@ -123,7 +121,7 @@ namespace KoeBook.Epub.Services
 
         private record SectionWithChapterTitle(string? title, Section section);
 
-        private async Task<SectionWithChapterTitle> ReadPageAsync(string url, bool isRensai, string imageDirectory, CancellationToken ct)
+        private static async Task<SectionWithChapterTitle> ReadPageAsync(string url, bool isRensai, string imageDirectory, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
