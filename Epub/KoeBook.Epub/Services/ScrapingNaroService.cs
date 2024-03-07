@@ -161,11 +161,10 @@ namespace KoeBook.Epub.Services
                 sectionTitleElement = doc.QuerySelector(".novel_title");
             }
 
-            string sectionTitle = "";
             if (sectionTitleElement == null)
                 throw new EpubDocumentException("Can not find title of page");
 
-            sectionTitle = sectionTitleElement.InnerHtml;
+            var sectionTitle = sectionTitleElement.InnerHtml;
 
             var section = new Section(sectionTitleElement.InnerHtml);
 
@@ -236,6 +235,7 @@ namespace KoeBook.Epub.Services
                         if (tags.TagName != "RUBY")
                         {
                             isAllRuby = false;
+                            break;
                         }
                     }
 
