@@ -40,8 +40,8 @@ namespace KoeBook.Epub.Services
             else
             {
                 bookAuther = bookAutherElement.InnerHtml.Replace("作者：", "");
-            } 
-                
+            }
+
             bool isRensai = true;
             int allNum = 0;
 
@@ -253,8 +253,6 @@ namespace KoeBook.Epub.Services
             }
             return new SectionWithChapterTitle(chapterTitle, section);
         }
-
-
 
         [System.Text.RegularExpressions.GeneratedRegex(@"https://.{5,7}.syosetu.com/(.{7}).?")]
         private static partial System.Text.RegularExpressions.Regex UrlToNcode();
