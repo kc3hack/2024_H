@@ -10,6 +10,15 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
     private readonly IFileExtensionService _fileExtensionService = fileExtensionService;
     private readonly StringBuilder _builder = new();
 
+    internal const string ContainerXml = """
+         <?xml version="1.0" encoding="UTF-8"?>
+         <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+             <rootfiles>
+                 <rootfile full-path="OEBPS/book.opf" media-type="application/oebps-package+xml" />
+             </rootfiles>
+         </container>
+         """;
+
     public async ValueTask<bool> TryCreateEpubAsync(EpubDocument epubDocument, string tmpDirectory, CancellationToken ct)
     {
         if (!File.Exists(epubDocument.CoverFilePath))
@@ -31,7 +40,7 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             var containerEntry = archive.CreateEntry("META-INF/container.xml");
             using (var containerStream = new StreamWriter(containerEntry.Open()))
             {
-                await containerStream.WriteLineAsync(CreateContainerXml()).ConfigureAwait(false);
+                await containerStream.WriteLineAsync(ContainerXml).ConfigureAwait(false);
                 await containerStream.FlushAsync(ct).ConfigureAwait(false);
             }
 
@@ -254,15 +263,6 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             """);
         return _builder.ToString();
     }
-
-    internal static string CreateContainerXml() => """
-         <?xml version="1.0" encoding="UTF-8"?>
-         <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-             <rootfiles>
-                 <rootfile full-path="OEBPS/book.opf" media-type="application/oebps-package+xml" />
-             </rootfiles>
-         </container>
-         """;
 
     internal string CreateSectionXhtml(Section section)
     {
