@@ -63,13 +63,13 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
                     var sectionXhtmlEntry = archive.CreateEntry($"OEBPS/{epubDocument.Chapters[i].Sections[j].Id}.xhtml");
                     using (var sectionXhtmlStream = new StreamWriter(sectionXhtmlEntry.Open()))
                     {
-                        await sectionXhtmlStream.WriteLineAsync(epubDocument.Chapters[i].Sections[j].CreateSectionXhtml()).ConfigureAwait(false);
+                        await sectionXhtmlStream.WriteLineAsync(CreateSectionXhtml(epubDocument.Chapters[i].Sections[j])).ConfigureAwait(false);
                         await sectionXhtmlStream.FlushAsync(ct).ConfigureAwait(false);
                     }
                     var sectionSmilEntry = archive.CreateEntry($"OEBPS/{epubDocument.Chapters[i].Sections[j].Id}_audio.smil");
                     using (var sectionSmilStream = new StreamWriter(sectionSmilEntry.Open()))
                     {
-                        await sectionSmilStream.WriteLineAsync(epubDocument.Chapters[i].Sections[j].CreateSectionSmil()).ConfigureAwait(false);
+                        await sectionSmilStream.WriteLineAsync(CreateSectionSmil(epubDocument.Chapters[i].Sections[j])).ConfigureAwait(false);
                         await sectionSmilStream.FlushAsync(ct).ConfigureAwait(false);
                     }
                     for (var k = 0; k < epubDocument.Chapters[i].Sections[j].Elements.Count; k++)
@@ -260,4 +260,71 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
              </rootfiles>
          </container>
          """;
+
+    internal static string CreateSectionXhtml(Section section)
+    {
+        var builder = new StringBuilder($"""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+                <head>  
+                    <link rel="stylesheet" type="text/css" media="all" href="style.css"/>
+                    <title>{section.Title}</title> 
+                </head> 
+                <body>
+            """);
+
+        for (var i = 0; i < section.Elements.Count; i++)
+        {
+            if (section.Elements[i] is Paragraph para)
+            {
+                builder.AppendLine($"""
+                            <p id="s_{section.Id}_p{i}" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
+                                {para.Text}
+                            </p>
+                    """);
+            }
+            else if (section.Elements[i] is Picture pic && File.Exists(pic.PictureFilePath))
+            {
+                builder.AppendLine($"""
+                            <p id="s_{section.Id}_p{i}" {(pic.ClassName != null ? $"class=\"{pic.ClassName}\"" : "")}>
+                                <img src="{Path.GetFileName(pic.PictureFilePath)}"
+                            </p>
+                    """);
+            }
+        }
+
+        builder.AppendLine("""
+                </body>
+            </html>
+            """);
+        return builder.ToString();
+    }
+
+    internal static string CreateSectionSmil(Section section)
+    {
+        var builder = new StringBuilder($"""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+                <body>
+            """);
+
+        for (var i = 0; i < section.Elements.Count; i++)
+        {
+            if (section.Elements[i] is Paragraph para && para.Audio != null)
+            {
+                builder.AppendLine($"""
+                    <par id="s_{section.Id}_p{i}_audio" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
+                        <text src="{section.Id}.xhtml#s_{section.Id}_p{i}" />
+                        <audio clipBegin="0s" clipEnd="{para.Audio?.TotalTime}" src="{section.Id}_p{i}.mp3"/>
+                    </par>
+            """);
+            }
+        }
+
+        builder.AppendLine("""
+                </body>
+            </smil>
+            """);
+        return builder.ToString();
+    }
 }
