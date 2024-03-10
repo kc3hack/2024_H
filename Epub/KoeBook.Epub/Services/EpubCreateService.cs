@@ -8,6 +8,8 @@ namespace KoeBook.Epub.Services;
 public class EpubCreateService(IFileExtensionService fileExtensionService) : IEpubCreateService
 {
     private readonly IFileExtensionService _fileExtensionService = fileExtensionService;
+    private readonly StringBuilder _builder = new();
+
     public async ValueTask<bool> TryCreateEpubAsync(EpubDocument epubDocument, string tmpDirectory, CancellationToken ct)
     {
         if (!File.Exists(epubDocument.CoverFilePath))
@@ -102,9 +104,10 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         }
     }
 
-    internal static string CreateNavXhtml(EpubDocument epubDocument)
+    internal string CreateNavXhtml(EpubDocument epubDocument)
     {
-        var builder = new StringBuilder($"""
+        _builder.Clear();
+        _builder.AppendLine($"""
             <?xml version="1.0" encoding="UTF-8"?>
             <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
                 <head>
@@ -114,13 +117,13 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
                 <body>
                     <nav epub:type="toc" id="toc">
                         <ol>
-
             """);
+
         if (epubDocument.Chapters.Count == 1 && epubDocument.Chapters[0].Title == null)
         {
             for (var i = 0; i < epubDocument.Chapters[0].Sections.Count; i++)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                 <li>
                                     <a href="{epubDocument.Chapters[0].Sections[i].Id}.xhtml#s_{epubDocument.Chapters[0].Sections[i].Id}_p0">{epubDocument.Chapters[0].Sections[i].Title}</a>
                                 </li>
@@ -131,47 +134,48 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         {
             for (var i = 0; i < epubDocument.Chapters.Count; i++)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                     <li>
                                         <span>{epubDocument.Chapters[i].Title}</span>
                                         <ol>
                     """);
                 for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
                 {
-                    builder.AppendLine($"""
+                    _builder.AppendLine($"""
                                                 <li>
                                                     <a href="{epubDocument.Chapters[i].Sections[j].Id}.xhtml#s_{epubDocument.Chapters[i].Sections[j].Id}_p0">{epubDocument.Chapters[i].Sections[j].Title}</a>
                                                 </li>
                         """);
                 }
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                         </ol>
                                     </li>
                     """);
             }
         }
-        builder.AppendLine($"""
+        _builder.AppendLine($"""
                         </ol>
                     </nav>
                 </body>
             </html>
             """);
-        return builder.ToString();
+        return _builder.ToString();
     }
 
-    internal static string CreateCssText(EpubDocument epubDocument)
+    internal string CreateCssText(EpubDocument epubDocument)
     {
-        var builder = new StringBuilder();
+        _builder.Clear();
         foreach (var cssClass in epubDocument.CssClasses)
         {
-            builder.AppendLine(cssClass.Text);
+            _builder.AppendLine(cssClass.Text);
         }
-        return builder.ToString();
+        return _builder.ToString();
     }
 
     internal string CreateOpf(EpubDocument epubDocument)
     {
-        var builder = new StringBuilder($"""
+        _builder.Clear();
+        _builder.AppendLine($"""
             <package unique-identifier="pub-id" version="3.0" xmlns="http://www.idpf.org/2007/opf">
                 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
                     <dc:title  id="title">{epubDocument.Title}</dc:title>
@@ -183,7 +187,6 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
                     <meta property="dcterms:modified">{DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)}</meta>
                     <meta property="media:active-class">-epub-media-overlay-active</meta>
                     <meta property="media:playback-active-class">-epub-media-overlay-unactive</meta>
-
             """);
 
         var totalTime = TimeSpan.Zero;
@@ -193,12 +196,12 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             {
                 var time = epubDocument.Chapters[i].Sections[j].GetTotalTime();
                 totalTime += time;
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                 <meta property="media:duration" refines="#smil_{i}_{j}">{time}</meta>
                         """);
             }
         }
-        builder.AppendLine($"""
+        _builder.AppendLine($"""
                     <meta property="media:duration">{totalTime}</meta>
                 </metadata>
                 <manifest>
@@ -211,7 +214,7 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         {
             for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                 <item id="section_{i}_{j}" href="{epubDocument.Chapters[i].Sections[j].Id}.xhtml" media-type="application/xhtml+xml" media-overlay="smil_{i}_{j}" />
                                 <item id="smil_{i}_{j}" href="{epubDocument.Chapters[i].Sections[j].Id}_audio.smil" media-type="application/smil+xml" />
                         """);
@@ -220,17 +223,17 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
                     var element = epubDocument.Chapters[i].Sections[j].Elements[k];
                     if (element is Paragraph para && para.Audio != null)
                     {
-                        builder.AppendLine(@$"        <item id=""audio_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}.mp3"" media-type=""audio/mpeg"" />");
+                        _builder.AppendLine(@$"        <item id=""audio_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}.mp3"" media-type=""audio/mpeg"" />");
                     }
                     else if (element is Picture pic && File.Exists(pic.PictureFilePath))
                     {
-                        builder.AppendLine(@$"        <item id=""img_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}"" media-type=""{_fileExtensionService.GetImagesMediaType(pic.PictureFilePath)}"" />");
+                        _builder.AppendLine(@$"        <item id=""img_{i}_{j}_{k}"" href=""{epubDocument.Chapters[i].Sections[j].Id}_p{k}{Path.GetExtension(pic.PictureFilePath)}"" media-type=""{_fileExtensionService.GetImagesMediaType(pic.PictureFilePath)}"" />");
                     }
                 }
             }
         }
 
-        builder.AppendLine($"""
+        _builder.AppendLine($"""
                 </manifest>
                 <spine page-progression-direction="ltr">
             """);
@@ -239,17 +242,17 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         {
             for (var j = 0; j < epubDocument.Chapters[i].Sections.Count; j++)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                                 <itemref idref="section_{i}_{j}" id="itemref_{i}_{j}" />
                         """);
             }
         }
 
-        builder.AppendLine($"""
+        _builder.AppendLine($"""
                 </spine>
             </package>
             """);
-        return builder.ToString();
+        return _builder.ToString();
     }
 
     internal static string CreateContainerXml() => """
@@ -261,9 +264,10 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
          </container>
          """;
 
-    internal static string CreateSectionXhtml(Section section)
+    internal string CreateSectionXhtml(Section section)
     {
-        var builder = new StringBuilder($"""
+        _builder.Clear();
+        _builder.AppendLine($"""
             <?xml version="1.0" encoding="UTF-8"?>
             <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
                 <head>  
@@ -277,7 +281,7 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         {
             if (section.Elements[i] is Paragraph para)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                             <p id="s_{section.Id}_p{i}" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
                                 {para.Text}
                             </p>
@@ -285,7 +289,7 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             }
             else if (section.Elements[i] is Picture pic && File.Exists(pic.PictureFilePath))
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                             <p id="s_{section.Id}_p{i}" {(pic.ClassName != null ? $"class=\"{pic.ClassName}\"" : "")}>
                                 <img src="{Path.GetFileName(pic.PictureFilePath)}"
                             </p>
@@ -293,16 +297,17 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             }
         }
 
-        builder.AppendLine("""
+        _builder.AppendLine("""
                 </body>
             </html>
             """);
-        return builder.ToString();
+        return _builder.ToString();
     }
 
-    internal static string CreateSectionSmil(Section section)
+    internal string CreateSectionSmil(Section section)
     {
-        var builder = new StringBuilder($"""
+        _builder.Clear();
+        _builder.AppendLine($"""
             <?xml version="1.0" encoding="UTF-8"?>
             <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
                 <body>
@@ -312,7 +317,7 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
         {
             if (section.Elements[i] is Paragraph para && para.Audio != null)
             {
-                builder.AppendLine($"""
+                _builder.AppendLine($"""
                     <par id="s_{section.Id}_p{i}_audio" {(para.ClassName != null ? $"class=\"{para.ClassName}\"" : "")}>
                         <text src="{section.Id}.xhtml#s_{section.Id}_p{i}" />
                         <audio clipBegin="0s" clipEnd="{para.Audio?.TotalTime}" src="{section.Id}_p{i}.mp3"/>
@@ -321,10 +326,10 @@ public class EpubCreateService(IFileExtensionService fileExtensionService) : IEp
             }
         }
 
-        builder.AppendLine("""
+        _builder.AppendLine("""
                 </body>
             </smil>
             """);
-        return builder.ToString();
+        return _builder.ToString();
     }
 }
