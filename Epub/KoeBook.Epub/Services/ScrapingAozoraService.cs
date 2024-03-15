@@ -2,6 +2,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
+using KoeBook.Core;
 using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
 using static KoeBook.Epub.Utility.ScrapingHelper;
@@ -29,11 +30,11 @@ namespace KoeBook.Epub.Services
 
             // title の取得
             var bookTitle = doc.QuerySelector(".title")
-                ?? throw new EpubDocumentException($"Failed to get title properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
+                ?? throw new EbookException(ExceptionType.WebScrapingFailed, $"Failed to get title properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
 
             // auther の取得
             var bookAuther = doc.QuerySelector(".author")
-                ?? throw new EpubDocumentException($"Failed to get auther properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
+                ?? throw new EbookException(ExceptionType.WebScrapingFailed, $"Failed to get auther properly.\nYou may be able to get proper URL at {GetCardUrl(url)}");
 
             // EpubDocument の生成
             var document = new EpubDocument(TextReplace(bookTitle.InnerHtml), TextReplace(bookAuther.InnerHtml), coverFilePath, id)
@@ -111,10 +112,10 @@ namespace KoeBook.Epub.Services
                     if (midashi != null)
                     {
                         if (midashi.Id == null)
-                            throw new EpubDocumentException("Unecpected structure of HTML File: div tag with class=\"midashi_anchor\", but id=\"midashi___\" exist");
+                            throw new EbookException(ExceptionType.WebScrapingFailed, "Unecpected structure of HTML File: div tag with class=\"midashi_anchor\", but id=\"midashi___\" exist");
 
                         if (!int.TryParse(midashi.Id.Replace("midashi", ""), out var midashiId))
-                            throw new EpubDocumentException($"Unexpected id of Anchor tag was found: id = {midashi.Id}");
+                            throw new EbookException(ExceptionType.WebScrapingFailed, $"Unexpected id of Anchor tag was found: id = {midashi.Id}");
 
                         if (contentsIds.Contains(midashiId))
                         {
