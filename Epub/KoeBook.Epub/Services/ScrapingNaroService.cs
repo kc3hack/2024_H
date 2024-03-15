@@ -6,13 +6,15 @@ using AngleSharp.Io;
 using KoeBook.Core;
 using KoeBook.Epub.Contracts.Services;
 using KoeBook.Epub.Models;
+using Microsoft.Extensions.DependencyInjection;
 using static KoeBook.Epub.Utility.ScrapingHelper;
 
 namespace KoeBook.Epub.Services
 {
-    public partial class ScrapingNaroService(IHttpClientFactory httpClientFactory) : IScrapingService
+    public partial class ScrapingNaroService(IHttpClientFactory httpClientFactory, [FromKeyedServices(nameof(ScrapingNaroService))] IScrapingClientService scrapingClientService) : IScrapingService
     {
         private readonly IHttpClientFactory _httpCliantFactory = httpClientFactory;
+        private readonly IScrapingClientService _scrapingClientService = scrapingClientService;
 
         public bool IsMatchSite(Uri uri)
         {
@@ -22,6 +24,7 @@ namespace KoeBook.Epub.Services
         public async ValueTask<EpubDocument> ScrapingAsync(string url, string coverFilePath, string imageDirectory, Guid id, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
+
             using var context = BrowsingContext.New(config);
             var doc = await context.OpenAsync(url, ct).ConfigureAwait(false);
 
@@ -133,7 +136,7 @@ namespace KoeBook.Epub.Services
 
         private record SectionWithChapterTitle(string? title, Section section);
 
-        private static async Task<SectionWithChapterTitle> ReadPageAsync(string url, bool isRensai, string imageDirectory, CancellationToken ct)
+        private async Task<SectionWithChapterTitle> ReadPageAsync(string url, bool isRensai, string imageDirectory, CancellationToken ct)
         {
             var config = Configuration.Default.WithDefaultLoader();
             using var context = BrowsingContext.New(config);
