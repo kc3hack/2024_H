@@ -45,5 +45,11 @@ public enum ExceptionType
     Gpt4TalkerAndStyleSettingFailed,
 
     [EnumMember(Value = "webページの解析に失敗しました")]
-    WebScrapingFailed
+    WebScrapingFailed,
+
+    [EnumMember(Value = "小説情報の取得に失敗しました")]
+    NarouApiFailed,
+
+    [EnumMember(Value = "予期しない構造です")]
+    UnexpectedStructure
 }
