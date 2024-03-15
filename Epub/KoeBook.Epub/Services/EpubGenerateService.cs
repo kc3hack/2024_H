@@ -12,7 +12,7 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
     private readonly ISoundGenerationService _soundGenerationService = soundGenerationService;
     private readonly IEpubDocumentStoreService _documentStoreService = epubDocumentStoreService;
     private readonly IEpubCreateService _createService = epubCreateService;
-    
+
     public async ValueTask<string> GenerateEpubAsync(BookScripts bookScripts, string tempDirectory, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
