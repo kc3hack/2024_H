@@ -32,8 +32,7 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
         }
         else
         {
-            EbookException.Throw(ExceptionType.EpubCreateError);
-            return "";
+            throw new EbookException(ExceptionType.EpubCreateError);
         }
     }
 }
