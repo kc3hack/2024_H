@@ -1,10 +1,18 @@
-﻿namespace KoeBook.Epub.Contracts.Services;
+﻿using System.Net.Http.Headers;
+
+namespace KoeBook.Epub.Contracts.Services;
 
 public interface IScrapingClientService
 {
     /// <summary>
     /// スクレイピングでGETする用
-    /// APIは不要
+    /// APIを叩く際は不要
     /// </summary>
-    ValueTask<HttpResponseMessage> GetAsync(string url, CancellationToken ct);
+    Task<string> GetAsStringAsync(string url, CancellationToken ct);
+
+    /// <summary>
+    /// スクレイピングでGETする用
+    /// APIを叩く際は不要
+    /// </summary>
+    Task<ContentDispositionHeaderValue?> GetAsStreamAsync(string url, Stream destination, CancellationToken ct);
 }
