@@ -9,10 +9,10 @@ namespace KoeBook.Epub.Services;
 
 public class EpubGenerateService(ISoundGenerationService soundGenerationService, IEpubDocumentStoreService epubDocumentStoreService, IEpubCreateService epubCreateService) : IEpubGenerateService
 {
-    private ISoundGenerationService _soundGenerationService = soundGenerationService;
-    private IEpubDocumentStoreService _documentStoreService = epubDocumentStoreService;
-    private IEpubCreateService _createService = epubCreateService;
-
+    private readonly ISoundGenerationService _soundGenerationService = soundGenerationService;
+    private readonly IEpubDocumentStoreService _documentStoreService = epubDocumentStoreService;
+    private readonly IEpubCreateService _createService = epubCreateService;
+    
     public async ValueTask<string> GenerateEpubAsync(BookScripts bookScripts, string tempDirectory, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -32,7 +32,8 @@ public class EpubGenerateService(ISoundGenerationService soundGenerationService,
         }
         else
         {
-            throw new EbookException(ExceptionType.EpubCreateError);
+            EbookException.Throw(ExceptionType.EpubCreateError);
+            return "";
         }
     }
 }
