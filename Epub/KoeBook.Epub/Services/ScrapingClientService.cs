@@ -7,7 +7,7 @@ public sealed class ScrapingClientService : IScrapingClientService, IDisposable
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly PeriodicTimer _periodicTimer;
-    private readonly Queue<Func<HttpClient, ValueTask>> _actionQueue = [];
+    private readonly Queue<Func<HttpClient, Task>> _actionQueue = [];
     private bool _workerActivated;
 
     public ScrapingClientService(IHttpClientFactory httpClientFactory, TimeProvider timeProvider)
@@ -18,56 +18,28 @@ public sealed class ScrapingClientService : IScrapingClientService, IDisposable
         Worker();
     }
 
-    public void Dispose()
-    {
-        _periodicTimer.Dispose();
-    }
-
-    private async void Worker()
-    {
-        lock (_actionQueue)
-        {
-            _workerActivated = true;
-        }
-
-        while (await _periodicTimer.WaitForNextTickAsync().ConfigureAwait(false) && _actionQueue.Count > 0)
-        {
-            if (_actionQueue.TryDequeue(out var action))
-            {
-                await action(_httpClientFactory.CreateClient()).ConfigureAwait(false);
-            }
-        }
-
-        lock (_actionQueue)
-        {
-            _workerActivated = false;
-        }
-    }
-
     public Task<string> GetAsStringAsync(string url, CancellationToken ct)
     {
         var taskCompletion = new TaskCompletionSource<string>();
-        _actionQueue.Enqueue(async httpClient =>
-        {
-            if (ct.IsCancellationRequested)
-                taskCompletion.SetCanceled(ct);
-
-            try
-            {
-                var response = await httpClient.GetAsync(url, ct).ConfigureAwait(false);
-                taskCompletion.SetResult(await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
-            }
-            catch (Exception ex)
-            {
-                taskCompletion.SetException(ex);
-            }
-        });
 
         lock (_actionQueue)
-        {
-            if (!_workerActivated)
-                Worker();
-        }
+            _actionQueue.Enqueue(async httpClient =>
+            {
+                if (ct.IsCancellationRequested)
+                    taskCompletion.SetCanceled(ct);
+
+                try
+                {
+                    var response = await httpClient.GetAsync(url, ct).ConfigureAwait(false);
+                    taskCompletion.SetResult(await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+                }
+                catch (Exception ex)
+                {
+                    taskCompletion.SetException(ex);
+                }
+            });
+
+        EnsureWorkerActivated();
 
         return taskCompletion.Task;
     }
@@ -75,29 +47,72 @@ public sealed class ScrapingClientService : IScrapingClientService, IDisposable
     public Task<ContentDispositionHeaderValue?> GetAsStreamAsync(string url, Stream destination, CancellationToken ct)
     {
         var taskCompletion = new TaskCompletionSource<ContentDispositionHeaderValue?>();
-        _actionQueue.Enqueue(async httpClient =>
-        {
-            if (ct.IsCancellationRequested)
-                taskCompletion.SetCanceled(ct);
-
-            try
-            {
-                var response = await httpClient.GetAsync(url, ct).ConfigureAwait(false);
-                await response.Content.CopyToAsync(destination, ct).ConfigureAwait(false);
-                taskCompletion.SetResult(response.Content.Headers.ContentDisposition);
-            }
-            catch (Exception ex)
-            {
-                taskCompletion.SetException(ex);
-            }
-        });
 
         lock (_actionQueue)
-        {
-            if (!_workerActivated)
-                Worker();
-        }
+            _actionQueue.Enqueue(async httpClient =>
+            {
+                if (ct.IsCancellationRequested)
+                    taskCompletion.SetCanceled(ct);
+
+                try
+                {
+                    var response = await httpClient.GetAsync(url, ct).ConfigureAwait(false);
+                    await response.Content.CopyToAsync(destination, ct).ConfigureAwait(false);
+                    taskCompletion.SetResult(response.Content.Headers.ContentDisposition);
+                }
+                catch (Exception ex)
+                {
+                    taskCompletion.SetException(ex);
+                }
+            });
+
+        EnsureWorkerActivated();
 
         return taskCompletion.Task;
+    }
+
+    /// <summary>
+    /// <see cref="Worker"/>が起動していない場合は起動します
+    /// </summary>
+    private void EnsureWorkerActivated()
+    {
+        bool activateWorker;
+        lock (_actionQueue) activateWorker = !_workerActivated;
+
+        if (activateWorker)
+            Worker();
+    }
+
+    /// <summary>
+    /// <see cref="_actionQueue"/>のConsumer
+    /// 別スレッドでループさせるためにvoid
+    /// </summary>
+    private async void Worker()
+    {
+        lock (_actionQueue)
+            _workerActivated = true;
+
+        try
+        {
+            while (await _periodicTimer.WaitForNextTickAsync().ConfigureAwait(false) && _actionQueue.Count > 0)
+            {
+                Func<HttpClient, Task>? action;
+                lock (_actionQueue)
+                    if (!_actionQueue.TryDequeue(out action))
+                        continue;
+
+                await action(_httpClientFactory.CreateClient()).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            }
+        }
+        finally
+        {
+            lock (_actionQueue)
+                _workerActivated = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _periodicTimer.Dispose();
     }
 }
