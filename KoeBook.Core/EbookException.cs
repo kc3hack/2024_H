@@ -50,6 +50,9 @@ public enum ExceptionType
     [EnumMember(Value = "小説情報の取得に失敗しました")]
     NarouApiFailed,
 
-    [EnumMember(Value = "予期しない構造です")]
-    UnexpectedStructure
+    [EnumMember(Value = "Webページが予期しない構造です")]
+    UnexpectedStructure,
+
+    [EnumMember(Value = "HTTPリクエストエラー")]
+    HttpResponseError
 }

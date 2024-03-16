@@ -55,7 +55,7 @@ namespace KoeBook.Epub.Services
             var result = await client.SendAsync(message, ct).ConfigureAwait(false);
             var test = await result.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
             if (!result.IsSuccessStatusCode)
-                throw new EbookException(ExceptionType.WebScrapingFailed, "URLが正しくありません");
+                throw new EbookException(ExceptionType.HttpResponseError, $"URLが正しいかどうかやインターネットに正常に接続されているかどうかを確認してください。\nステータスコード: {result.StatusCode}\nメッセージ：{test}");
 
             var content = await result.Content.ReadFromJsonAsync<BookInfo[]>(ct).ConfigureAwait(false);
             if (content != null)
