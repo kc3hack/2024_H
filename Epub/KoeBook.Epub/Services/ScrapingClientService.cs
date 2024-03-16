@@ -14,8 +14,6 @@ public sealed class ScrapingClientService : IScrapingClientService, IDisposable
     {
         _httpClientFactory = httpClientFactory;
         _periodicTimer = new(TimeSpan.FromSeconds(10), timeProvider);
-
-        Worker();
     }
 
     public Task<string> GetAsStringAsync(string url, CancellationToken ct)
